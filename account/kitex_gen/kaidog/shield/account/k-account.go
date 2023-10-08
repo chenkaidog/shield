@@ -6,9 +6,9 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
-	"strings"
 	"shield/account/kitex_gen/base"
-	
+	"strings"
+
 	"github.com/apache/thrift/lib/go/thrift"
 
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"

@@ -11,12 +11,12 @@ type Error interface {
 }
 
 type BizError struct {
-	code  int32
-	msg   string
+	code int32
+	msg  string
 }
 
 func (err *BizError) Error() string {
-	return fmt.Sprintf("biz_rror[%d:%s]", err.code, err.msg)
+	return fmt.Sprintf("%d:%s", err.code, err.msg)
 }
 
 func (err *BizError) Code() int32 {
@@ -32,13 +32,13 @@ func (bizErr *BizError) SetErr(err error) Error {
 }
 
 func (bizErr *BizError) SetMsg(msg string) Error {
-	return New(bizErr.Code(),msg)
+	return New(bizErr.Code(), msg)
 }
 
 func New(code int32, msg string) Error {
 	return &BizError{
 		code: code,
-		msg: msg,
+		msg:  msg,
 	}
 }
 
@@ -58,7 +58,10 @@ func ErrorEqual(err1, err2 Error) bool {
 }
 
 var (
-	Success = New(0, "success")
-	ServerError = New(1_000_01, "internal server error")
-	ParamError  = New(1_000_02, "param error")
+	Success             = New(0, "success")
+	ServerError         = New(1_0001, "internal server error")
+	ParamError          = New(1_0002, "param error")
+	DbError             = New(1_0003, "db error")
+	RecordNotFoundError = New(1_0004, "record not found error")
+	DbDuplicateError    = New(1_0005, "db key duplicate error")
 )
