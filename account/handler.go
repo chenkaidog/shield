@@ -40,7 +40,6 @@ func (s *AccountServiceImpl) UpdateAccountStatus(ctx context.Context, req *accou
 
 // Login implements the AccountServiceImpl interface.
 func (s *AccountServiceImpl) Login(ctx context.Context, req *account.AccountLoginReq) (resp *account.AccountLoginResp, err error) {
-	panic("test panic")
 	return
 }
 

@@ -11,7 +11,7 @@ import (
 func main() {
 	svr := account.NewServer(
 		new(AccountServiceImpl),
-		server.WithSuite(kitex.NewSuite()),
+		server.WithSuite(kitex.NewServerSuite()),
 	)
 
 	err := svr.Run()

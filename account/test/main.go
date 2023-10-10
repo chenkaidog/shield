@@ -1,27 +1,67 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
-	"shield/account/kitex_gen/base"
-	"shield/account/kitex_gen/kaidog/shield/account"
-	"shield/account/kitex_gen/kaidog/shield/account/accountservice"
-
-	"github.com/cloudwego/kitex/client"
+	"reflect"
 )
 
+type SensitiveMarshal struct {
+	sensitiveSet map[string]bool
+}
+
+func (sm *SensitiveMarshal) Marshal(obj interface{}) interface{} {
+	objValue := reflect.ValueOf(obj).Elem()
+    objType := objValue.Type()
+
+    mapper := make(map[string]interface{})
+
+    for i := 0; i < objValue.NumField(); i++ {
+        field := objValue.Field(i)
+        fieldName := objType.Field(i).Name
+
+		if sm.sensitiveSet[fieldName] {
+			mapper[fieldName] = "******"
+		} else {
+			if field.Kind() == reflect.Struct || 
+			field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct{
+				mapper[fieldName] = sm.Marshal(field.Interface())
+			}
+			mapper[fieldName] = field.Interface()
+		}
+	}
+
+	return mapper
+}
+
+type User struct {
+	Name string 
+	Info1 Info1
+	Info2 *Info2
+}
+
+type Info1 struct {
+	Password string 
+}
+
+type Info2 struct {
+	List []string 
+}
+
 func main() {
-	ctx := context.Background()
-	client := accountservice.MustNewClient("AccountService", client.WithHostPorts("0.0.0.0:8888"))
-	resp, err := client.Login(ctx, &account.AccountLoginReq{
-		Username: "bobbobobo",
-		Password: "12345678",
-		Ipv4: "127.0.0.1",
-		Device: "PC",
-		Base: &base.BaseReq{
-			TraceID: "trace_id",
-			Caller: "client",
+	user := &User{
+		Name: "Jack",
+		Info1: Info1{
+			Password: "123456",
 		},
-	})
-	fmt.Println(resp, err)
+		Info2: &Info2{
+			List: []string{"elem1", "elem2"},
+		},
+	}
+
+	sm := &SensitiveMarshal{
+		sensitiveSet: map[string]bool{"Password": true},
+	}
+
+	fmt.Println(sm.Marshal(user))
 }
