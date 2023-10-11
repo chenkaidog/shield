@@ -3,11 +3,18 @@ package kitex
 import (
 	"context"
 	"shield/common/logs"
+	"shield/common/utils"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/consts"
 	"github.com/cloudwego/kitex/pkg/endpoint"
 )
+
+func init() {
+	sensitiveMarshal = utils.NewSensitiveMarshal("password")
+}
+
+var sensitiveMarshal *utils.SensitiveMarshal
 
 func ServerLogMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request, response interface{}) error {
@@ -26,11 +33,14 @@ func ServerLogMW(next endpoint.Endpoint) endpoint.Endpoint {
 			respBody = respArg.GetResult()
 		}
 
-		logs.CtxInfo(ctx, "[%s] request body: %v", methodName, reqBody)
+		logs.CtxInfo(ctx, "[%s] request body: %v", methodName, sensitiveMarshal.SafeMarshal(reqBody))
+		defer func() {
+			logs.CtxInfo(ctx, "[%s] resp body: %v, cost: %dms",
+				methodName, sensitiveMarshal.SafeMarshal(respBody), time.Since(startTime)/time.Millisecond)
+		}()
 		if err := next(ctx, request, response); err != nil {
 			return err
 		}
-		logs.CtxInfo(ctx, "[%s] resp body: %v, cost: %dms", methodName, respBody, time.Since(startTime)/time.Millisecond)
 
 		return nil
 	}

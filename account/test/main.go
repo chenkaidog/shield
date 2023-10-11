@@ -17,12 +17,12 @@ func (sm *SensitiveMarshal) Marshal(obj interface{}) interface{} {
 	}
 	objType := objValue.Type()
 
-    mapper := make(map[string]interface{})
+	mapper := make(map[string]interface{})
 
-    for i := 0; i < objValue.NumField(); i++ {
-        field := objValue.Field(i)
-        fieldName := objType.Field(i).Name
-		jsonTag :=  objType.Field(i).Tag.Get("json")
+	for i := 0; i < objValue.NumField(); i++ {
+		field := objValue.Field(i)
+		fieldName := objType.Field(i).Name
+		jsonTag := objType.Field(i).Tag.Get("json")
 		if jsonTag != "" {
 			if jsonTag == "-" {
 				continue
@@ -33,8 +33,8 @@ func (sm *SensitiveMarshal) Marshal(obj interface{}) interface{} {
 		if sm.sensitiveSet[fieldName] {
 			mapper[fieldName] = "******"
 		} else {
-			if field.Kind() == reflect.Struct || 
-			field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct{
+			if field.Kind() == reflect.Struct ||
+				field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct {
 				mapper[fieldName] = sm.Marshal(field.Interface())
 			} else {
 				mapper[fieldName] = field.Interface()
@@ -46,19 +46,19 @@ func (sm *SensitiveMarshal) Marshal(obj interface{}) interface{} {
 }
 
 type User struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
 	Password string `json:"-"`
-	Info1 Info1
-	Info2 *Info2
+	Info1    Info1
+	Info2    *Info2
 }
 
 type Info1 struct {
-	Password string 
+	Password string
 }
 
 type Info2 struct {
-	List []string 
-	Password string 
+	List     []string
+	Password string
 }
 
 func main() {

@@ -69,7 +69,6 @@ func (l *Logger) withContext(ctx context.Context) *logrus.Entry {
 			logrus.Fields{
 				"trace_id": trace.TraceID,
 				"span_id":  trace.SpanID,
-				"pspan_id": trace.PSpanID,
 				"log_id":   trace.LogID,
 			})
 	}

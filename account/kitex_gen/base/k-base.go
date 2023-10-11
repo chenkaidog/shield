@@ -29,8 +29,9 @@ func (p *BaseReq) FastRead(buf []byte) (int, error) {
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetLogID bool = false
 	var issetTraceID bool = false
-	var issetCaller bool = false
+	var issetSpanID bool = false
 	var issetExtra bool = false
 	_, l, err = bthrift.Binary.ReadStructBegin(buf)
 	offset += l
@@ -55,7 +56,7 @@ func (p *BaseReq) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetTraceID = true
+				issetLogID = true
 			} else {
 				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -70,7 +71,22 @@ func (p *BaseReq) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetCaller = true
+				issetTraceID = true
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSpanID = true
 			} else {
 				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -113,13 +129,18 @@ func (p *BaseReq) FastRead(buf []byte) (int, error) {
 		goto ReadStructEndError
 	}
 
-	if !issetTraceID {
+	if !issetLogID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCaller {
+	if !issetTraceID {
 		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSpanID {
+		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 
@@ -152,7 +173,7 @@ func (p *BaseReq) FastReadField1(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.TraceID = v
+		p.LogID = v
 
 	}
 	return offset, nil
@@ -166,7 +187,21 @@ func (p *BaseReq) FastReadField2(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.Caller = v
+		p.TraceID = v
+
+	}
+	return offset, nil
+}
+
+func (p *BaseReq) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.SpanID = v
 
 	}
 	return offset, nil
@@ -223,6 +258,7 @@ func (p *BaseReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter)
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 		offset += p.fastWriteField255(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
@@ -236,6 +272,7 @@ func (p *BaseReq) BLength() int {
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
+		l += p.field3Length()
 		l += p.field255Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
@@ -245,8 +282,8 @@ func (p *BaseReq) BLength() int {
 
 func (p *BaseReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "traceID", thrift.STRING, 1)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.TraceID)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "logID", thrift.STRING, 1)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.LogID)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -254,8 +291,17 @@ func (p *BaseReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter)
 
 func (p *BaseReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "caller", thrift.STRING, 2)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Caller)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "traceID", thrift.STRING, 2)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.TraceID)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *BaseReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "spanID", thrift.STRING, 3)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.SpanID)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -283,8 +329,8 @@ func (p *BaseReq) fastWriteField255(buf []byte, binaryWriter bthrift.BinaryWrite
 
 func (p *BaseReq) field1Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("traceID", thrift.STRING, 1)
-	l += bthrift.Binary.StringLengthNocopy(p.TraceID)
+	l += bthrift.Binary.FieldBeginLength("logID", thrift.STRING, 1)
+	l += bthrift.Binary.StringLengthNocopy(p.LogID)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -292,8 +338,17 @@ func (p *BaseReq) field1Length() int {
 
 func (p *BaseReq) field2Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("caller", thrift.STRING, 2)
-	l += bthrift.Binary.StringLengthNocopy(p.Caller)
+	l += bthrift.Binary.FieldBeginLength("traceID", thrift.STRING, 2)
+	l += bthrift.Binary.StringLengthNocopy(p.TraceID)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *BaseReq) field3Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("spanID", thrift.STRING, 3)
+	l += bthrift.Binary.StringLengthNocopy(p.SpanID)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

@@ -1,0 +1,12 @@
+mysql:
+  db_name: "auth"
+  ip: "127.0.0.1"
+  port: 3306
+  username: "root"
+  password: "kaidong0115"
+
+redis:
+  ip: "127.0.0.1"
+  port: 6379
+  password: ""
+  db: 0

@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"shield/account/internal/config"
+	"shield/account/internal/repos"
 	account "shield/account/kitex_gen/kaidog/shield/account/accountservice"
 	"shield/common/middleware/kitex"
 
@@ -9,6 +11,9 @@ import (
 )
 
 func main() {
+	config.Init()
+	repos.Init()
+
 	svr := account.NewServer(
 		new(AccountServiceImpl),
 		server.WithSuite(kitex.NewServerSuite()),

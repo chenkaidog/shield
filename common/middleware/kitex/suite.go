@@ -2,11 +2,11 @@ package kitex
 
 import "github.com/cloudwego/kitex/server"
 
-type Suite struct{}
+type ServerSuite struct{}
 
-func (*Suite) Options() []server.Option {
+func (*ServerSuite) Options() []server.Option {
 	return []server.Option{
-		server.WithMiddleware(TraceMW),
+		server.WithMiddleware(ServerTraceMW),
 		server.WithMiddleware(ServerLogMW),
 		server.WithMiddleware(ErrorHandlerMW),
 		server.WithMiddleware(RequestValidatorMW),
@@ -14,6 +14,6 @@ func (*Suite) Options() []server.Option {
 	}
 }
 
-func NewSuite() *Suite {
-	return new(Suite)
+func NewServerSuite() *ServerSuite {
+	return new(ServerSuite)
 }

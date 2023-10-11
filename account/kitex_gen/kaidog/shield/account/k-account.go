@@ -5,11 +5,10 @@ package account
 import (
 	"bytes"
 	"fmt"
+	"github.com/apache/thrift/lib/go/thrift"
 	"reflect"
 	"shield/account/kitex_gen/base"
 	"strings"
-
-	"github.com/apache/thrift/lib/go/thrift"
 
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )

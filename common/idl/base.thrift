@@ -1,8 +1,9 @@
 namespace go base
 
 struct BaseReq {
-    1: required string traceID
-    2: required string caller
+    1: required string logID
+    2: required string traceID
+    3: required string spanID
 
     255: required map<string, string> extra
 }

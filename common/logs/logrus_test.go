@@ -15,7 +15,6 @@ func TestLogrus(t *testing.T) {
 	ctx = context.WithValue(ctx, constant.Trace{}, constant.Trace{
 		TraceID: "trace_id",
 		SpanID:  "span",
-		PSpanID: "psan",
 		LogID:   "log_id",
 	})
 

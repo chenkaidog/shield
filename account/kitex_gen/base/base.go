@@ -9,8 +9,9 @@ import (
 )
 
 type BaseReq struct {
-	TraceID string            `thrift:"traceID,1,required" frugal:"1,required,string" json:"traceID"`
-	Caller  string            `thrift:"caller,2,required" frugal:"2,required,string" json:"caller"`
+	LogID   string            `thrift:"logID,1,required" frugal:"1,required,string" json:"logID"`
+	TraceID string            `thrift:"traceID,2,required" frugal:"2,required,string" json:"traceID"`
+	SpanID  string            `thrift:"spanID,3,required" frugal:"3,required,string" json:"spanID"`
 	Extra   map[string]string `thrift:"extra,255,required" frugal:"255,required,map<string:string>" json:"extra"`
 }
 
@@ -22,30 +23,38 @@ func (p *BaseReq) InitDefault() {
 	*p = BaseReq{}
 }
 
+func (p *BaseReq) GetLogID() (v string) {
+	return p.LogID
+}
+
 func (p *BaseReq) GetTraceID() (v string) {
 	return p.TraceID
 }
 
-func (p *BaseReq) GetCaller() (v string) {
-	return p.Caller
+func (p *BaseReq) GetSpanID() (v string) {
+	return p.SpanID
 }
 
 func (p *BaseReq) GetExtra() (v map[string]string) {
 	return p.Extra
 }
+func (p *BaseReq) SetLogID(val string) {
+	p.LogID = val
+}
 func (p *BaseReq) SetTraceID(val string) {
 	p.TraceID = val
 }
-func (p *BaseReq) SetCaller(val string) {
-	p.Caller = val
+func (p *BaseReq) SetSpanID(val string) {
+	p.SpanID = val
 }
 func (p *BaseReq) SetExtra(val map[string]string) {
 	p.Extra = val
 }
 
 var fieldIDToName_BaseReq = map[int16]string{
-	1:   "traceID",
-	2:   "caller",
+	1:   "logID",
+	2:   "traceID",
+	3:   "spanID",
 	255: "extra",
 }
 
@@ -53,8 +62,9 @@ func (p *BaseReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetLogID bool = false
 	var issetTraceID bool = false
-	var issetCaller bool = false
+	var issetSpanID bool = false
 	var issetExtra bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -76,7 +86,7 @@ func (p *BaseReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetTraceID = true
+				issetLogID = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -87,7 +97,18 @@ func (p *BaseReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCaller = true
+				issetTraceID = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetSpanID = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -118,13 +139,18 @@ func (p *BaseReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetTraceID {
+	if !issetLogID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCaller {
+	if !issetTraceID {
 		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSpanID {
+		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 
@@ -154,7 +180,7 @@ func (p *BaseReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.TraceID = v
+		p.LogID = v
 	}
 	return nil
 }
@@ -163,7 +189,16 @@ func (p *BaseReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.Caller = v
+		p.TraceID = v
+	}
+	return nil
+}
+
+func (p *BaseReq) ReadField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.SpanID = v
 	}
 	return nil
 }
@@ -211,6 +246,10 @@ func (p *BaseReq) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 2
 			goto WriteFieldError
 		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
 		if err = p.writeField255(oprot); err != nil {
 			fieldId = 255
 			goto WriteFieldError
@@ -235,10 +274,10 @@ WriteStructEndError:
 }
 
 func (p *BaseReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("traceID", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("logID", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.TraceID); err != nil {
+	if err := oprot.WriteString(p.LogID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -252,10 +291,10 @@ WriteFieldEndError:
 }
 
 func (p *BaseReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("caller", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("traceID", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Caller); err != nil {
+	if err := oprot.WriteString(p.TraceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -266,6 +305,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *BaseReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("spanID", thrift.STRING, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.SpanID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *BaseReq) writeField255(oprot thrift.TProtocol) (err error) {
@@ -311,10 +367,13 @@ func (p *BaseReq) DeepEqual(ano *BaseReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.TraceID) {
+	if !p.Field1DeepEqual(ano.LogID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Caller) {
+	if !p.Field2DeepEqual(ano.TraceID) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.SpanID) {
 		return false
 	}
 	if !p.Field255DeepEqual(ano.Extra) {
@@ -325,14 +384,21 @@ func (p *BaseReq) DeepEqual(ano *BaseReq) bool {
 
 func (p *BaseReq) Field1DeepEqual(src string) bool {
 
-	if strings.Compare(p.TraceID, src) != 0 {
+	if strings.Compare(p.LogID, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *BaseReq) Field2DeepEqual(src string) bool {
 
-	if strings.Compare(p.Caller, src) != 0 {
+	if strings.Compare(p.TraceID, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *BaseReq) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.SpanID, src) != 0 {
 		return false
 	}
 	return true
