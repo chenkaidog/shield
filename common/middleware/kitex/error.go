@@ -3,7 +3,6 @@ package kitex
 import (
 	"context"
 	"reflect"
-	"shield/account/kitex_gen/base"
 	"shield/common/errs"
 
 	"github.com/cloudwego/kitex/pkg/endpoint"
@@ -22,16 +21,6 @@ func ErrorHandlerMW(next endpoint.Endpoint) endpoint.Endpoint {
 }
 
 func handleFailedResp(result interface{}, err error) {
-	baseResp := base.NewBaseResp()
-	baseResp.SetSuccess(false)
-	if bizErr, ok := err.(errs.Error); ok {
-		baseResp.SetCode(bizErr.Code())
-		baseResp.SetMsg(bizErr.Msg())
-	} else {
-		baseResp.SetCode(errs.ServerError.Code())
-		baseResp.SetMsg(err.Error())
-	}
-
 	if kRes, ok := result.(interface {
 		GetResult() interface{}
 		SetSuccess(x interface{})
@@ -42,20 +31,27 @@ func handleFailedResp(result interface{}, err error) {
 			kRes.SetSuccess(resp)
 		}
 
-		if rv, ok := resp.(interface {
-			SetBase(val *base.BaseResp)
+		baseRespField := reflect.ValueOf(resp).Elem().FieldByName("Base")
+		baseResp := reflect.New(baseRespField.Type().Elem())
+		baseRespField.Set(baseResp)
+		if baseInf, ok := baseResp.Interface().(interface{
+			SetCode(val int32)
+			SetMsg(val string) 
+			SetSuccess(val bool)
 		}); ok {
-			rv.SetBase(baseResp)
+			baseInf.SetSuccess(false)
+			if bizErr, ok := err.(errs.Error); ok {
+				baseInf.SetCode(bizErr.Code())
+				baseInf.SetMsg(bizErr.Msg())
+			} else {
+				baseInf.SetCode(errs.ServerError.Code())
+				baseInf.SetMsg(err.Error())
+			}
 		}
 	}
 }
 
 func handleSuccessResp(result interface{}) {
-	baseResp := base.NewBaseResp()
-	baseResp.SetCode(errs.Success.Code())
-	baseResp.SetMsg(errs.Success.Msg())
-	baseResp.SetSuccess(true)
-
 	if kRes, ok := result.(interface {
 		GetResult() interface{}
 		SetSuccess(x interface{})
@@ -66,10 +62,17 @@ func handleSuccessResp(result interface{}) {
 			kRes.SetSuccess(resp)
 		}
 
-		if rv, ok := resp.(interface {
-			SetBase(val *base.BaseResp)
+		baseRespField := reflect.ValueOf(resp).Elem().FieldByName("Base")
+		baseResp := reflect.New(baseRespField.Type().Elem())
+		baseRespField.Set(baseResp)
+		if baseInf, ok := baseResp.Interface().(interface{
+			SetCode(val int32)
+			SetMsg(val string) 
+			SetSuccess(val bool)
 		}); ok {
-			rv.SetBase(baseResp)
+			baseInf.SetSuccess(true)
+			baseInf.SetCode(errs.Success.Code())
+			baseInf.SetMsg(errs.Success.Msg())
 		}
 	}
 }
