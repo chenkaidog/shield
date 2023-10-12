@@ -3,6 +3,8 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bytedance/gopkg/lang/fastrand"
@@ -61,7 +63,13 @@ func newTraceIdPool(size int, stop chan interface{}) <-chan string {
 			case <-stop:
 				return
 			default:
-				pool <- fmt.Sprintf("%010d%d%d%d", IPv4Int(), os.Getpid(), time.Now().UnixMilli(), fastrand.Uint64())
+				sb := strings.Builder{}
+				sb.WriteString(strconv.FormatUint(uint64(time.Now().UnixMilli()), 36))
+				sb.WriteString(IPv4Hex())
+				sb.WriteString(strconv.FormatUint(fastrand.Uint64(), 36))
+				sb.WriteString(strconv.FormatInt(int64(os.Getpid()), 10))
+
+				pool <- sb.String()
 			}
 		}
 	}()
@@ -78,7 +86,11 @@ func newSpanIdPool(size int, stop chan interface{}) <-chan string {
 			case <-stop:
 				return
 			default:
-				pool <- fmt.Sprintf("%d%d", os.Getpid(), fastrand.Uint32())
+				sb := strings.Builder{}
+				sb.WriteString(strconv.FormatInt(int64(os.Getpid()), 10))
+				sb.WriteString(strconv.FormatUint(uint64(fastrand.Uint32()), 36))
+
+				pool <- sb.String()
 			}
 		}
 	}()
@@ -95,7 +107,13 @@ func newLogIdPool(size int, stop chan interface{}) <-chan string {
 			case <-stop:
 				return
 			default:
-				pool <- fmt.Sprintf("%010d%d%d%d", IPv4Int(), os.Getpid(), time.Now().UnixMilli(), fastrand.Uint64())
+				sb := strings.Builder{}
+				sb.WriteString(strconv.FormatUint(uint64(time.Now().UnixMilli()), 36))
+				sb.WriteString(IPv4Hex())
+				sb.WriteString(strconv.FormatUint(fastrand.Uint64(), 36))
+				sb.WriteString(strconv.FormatUint(uint64(os.Getpid()), 10))
+
+				pool <- sb.String()			
 			}
 		}
 	}()

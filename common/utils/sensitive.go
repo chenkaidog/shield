@@ -30,8 +30,15 @@ func (sm *SensitiveMarshal) SafeMarshal(obj interface{}) string {
 }
 
 func (sm *SensitiveMarshal) sensitiveMarshal(obj interface{}) interface{} {
+	if obj == nil {
+		return obj
+	}
+
 	objValue := reflect.ValueOf(obj)
 	if objValue.Kind() == reflect.Ptr {
+		if objValue.IsNil() {
+			return obj
+		}
 		// 如果是指针，需要获取指针指向的结构体值
 		objValue = objValue.Elem()
 	}
