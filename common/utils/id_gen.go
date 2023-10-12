@@ -113,7 +113,7 @@ func newLogIdPool(size int, stop chan interface{}) <-chan string {
 				sb.WriteString(strconv.FormatUint(fastrand.Uint64(), 36))
 				sb.WriteString(strconv.FormatUint(uint64(os.Getpid()), 10))
 
-				pool <- sb.String()			
+				pool <- sb.String()
 			}
 		}
 	}()

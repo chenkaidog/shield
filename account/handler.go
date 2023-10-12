@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	account "shield/account/kitex_gen/kaidog/shield/account"
+	"shield/common/errs"
 )
 
 // AccountServiceImpl implements the last service interface defined in the IDL.
@@ -40,8 +41,7 @@ func (s *AccountServiceImpl) UpdateAccountStatus(ctx context.Context, req *accou
 
 // Login implements the AccountServiceImpl interface.
 func (s *AccountServiceImpl) Login(ctx context.Context, req *account.AccountLoginReq) (resp *account.AccountLoginResp, err error) {
-	panic("test")
-	return
+	return nil, errs.ParamError
 }
 
 // QueryLoginRecord implements the AccountServiceImpl interface.

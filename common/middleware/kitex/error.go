@@ -34,9 +34,9 @@ func handleFailedResp(result interface{}, err error) {
 		baseRespField := reflect.ValueOf(resp).Elem().FieldByName("Base")
 		baseResp := reflect.New(baseRespField.Type().Elem())
 		baseRespField.Set(baseResp)
-		if baseInf, ok := baseResp.Interface().(interface{
+		if baseInf, ok := baseResp.Interface().(interface {
 			SetCode(val int32)
-			SetMsg(val string) 
+			SetMsg(val string)
 			SetSuccess(val bool)
 		}); ok {
 			baseInf.SetSuccess(false)
@@ -65,9 +65,9 @@ func handleSuccessResp(result interface{}) {
 		baseRespField := reflect.ValueOf(resp).Elem().FieldByName("Base")
 		baseResp := reflect.New(baseRespField.Type().Elem())
 		baseRespField.Set(baseResp)
-		if baseInf, ok := baseResp.Interface().(interface{
+		if baseInf, ok := baseResp.Interface().(interface {
 			SetCode(val int32)
-			SetMsg(val string) 
+			SetMsg(val string)
 			SetSuccess(val bool)
 		}); ok {
 			baseInf.SetSuccess(true)

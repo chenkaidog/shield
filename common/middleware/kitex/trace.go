@@ -2,6 +2,7 @@ package kitex
 
 import (
 	"context"
+	"reflect"
 	"shield/common/constant"
 	"shield/common/utils"
 
@@ -18,16 +19,15 @@ func ServerTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, args, result interface{}) (err error) {
 		var traceID, spanID, logID string
 		if gfa, ok := args.(interface{ GetFirstArgument() interface{} }); ok {
-			if rv, ok := gfa.GetFirstArgument().(interface{ GetBase() interface{} }); ok {
-				if base, ok := rv.GetBase().(interface {
-					GetLogID() string
-					GetTraceID() string
-					GetSpanID() string
-				}); ok {
-					logID = base.GetLogID()
-					traceID = base.GetTraceID()
-					spanID = base.GetSpanID()
-				}
+			baseReq := reflect.ValueOf(gfa).Elem().FieldByName("Base").Interface()
+			if base, ok := baseReq.(interface {
+				GetLogID() string
+				GetTraceID() string
+				GetSpanID() string
+			}); ok {
+				logID = base.GetLogID()
+				traceID = base.GetTraceID()
+				spanID = base.GetSpanID()
 			}
 		}
 

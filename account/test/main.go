@@ -19,7 +19,7 @@ func main() {
 		Ipv4:     "127.0.0.1",
 		Device:   "PC",
 		Base: &base.BaseReq{
-			TraceID: "00000000000000",
+			TraceID: "000000000000001",
 			LogID:   "",
 			SpanID:  "",
 		},

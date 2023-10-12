@@ -2,7 +2,7 @@ package utils
 
 import "testing"
 
-func TestSensitive(t*testing.T) {
+func TestSensitive(t *testing.T) {
 	sm := NewSensitiveMarshal("password")
 	t.Run("nil", func(t *testing.T) {
 		type A struct{}
@@ -13,7 +13,7 @@ func TestSensitive(t*testing.T) {
 	})
 
 	t.Run("list", func(t *testing.T) {
-		t.Log(sm.SafeMarshal([]int{1,2,3}))
+		t.Log(sm.SafeMarshal([]int{1, 2, 3}))
 	})
 
 	t.Run("struct", func(t *testing.T) {
@@ -22,18 +22,18 @@ func TestSensitive(t*testing.T) {
 		}
 
 		type User struct {
-			Name string `json:"name"`
+			Name     string `json:"name"`
 			Password string `json:"password"`
-			Age int
-			A A
-			APtr *A
-			AaPtr *A
+			Age      int
+			A        A
+			APtr     *A
+			AaPtr    *A
 		}
 
 		user := User{
-			Name: "Jack",
+			Name:     "Jack",
 			Password: "123456",
-			Age: 18,
+			Age:      18,
 			A: A{
 				Password: 1,
 			},

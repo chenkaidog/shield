@@ -2,7 +2,7 @@ package utils
 
 import "testing"
 
-func TestIdGen(t*testing.T) {
+func TestIdGen(t *testing.T) {
 	idGen := NewIDGenerator(10)
 	t.Run("trace id", func(t *testing.T) {
 		t.Log(idGen.NewTraceID())

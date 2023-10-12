@@ -12,20 +12,22 @@ import (
 
 func PanicRecoverMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, args, result interface{}) (err error) {
-		_ = next(ctx, args, result)
+		if err := next(ctx, args, result); err != nil {
+			ri := rpcinfo.GetRPCInfo(ctx)
+			if stats := ri.Stats(); stats != nil {
+				if panicked, err := stats.Panicked(); panicked {
+					// `err` 就是框架调用 recover() 收到的对象
+					if detailErr, ok := err.(*kerrors.DetailedError); ok {
+						logs.CtxError(ctx, "panic occur: %s\n%s", detailErr.Error(), detailErr.Stack())
+					} else {
+						logs.CtxError(ctx, "panic occur: %v", err)
+					}
 
-		ri := rpcinfo.GetRPCInfo(ctx)
-		if stats := ri.Stats(); stats != nil {
-			if panicked, err := stats.Panicked(); panicked {
-				// `err` 就是框架调用 recover() 收到的对象
-				if detailErr, ok := err.(*kerrors.DetailedError); ok {
-					logs.CtxError(ctx, "panic occur: %s\n%s", detailErr.Error(), detailErr.Stack())
-				} else {
-					logs.CtxError(ctx, "panic occur: %v", err)
+					return errs.ServerError.SetMsg("internal server error")
 				}
-
-				return errs.ServerError.SetMsg("internal server error")
 			}
+
+			return err
 		}
 
 		return nil

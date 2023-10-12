@@ -31,7 +31,7 @@ func IPv4Hex() string {
 
 	for _, addr := range addrs {
 		if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() {
-			if ipv4:=ip.IP.To4();ipv4 != nil {
+			if ipv4 := ip.IP.To4(); ipv4 != nil {
 				return hex.EncodeToString(ipv4)
 			}
 		}
