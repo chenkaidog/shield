@@ -15,20 +15,21 @@ func init() {
 
 var idGen *utils.IDGenerator
 
+type BaseReq interface {
+    GetLogID() string
+    GetTraceID() string
+    GetSpanID() string
+}
+
 func ServerTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, args, result interface{}) (err error) {
 		var traceID, spanID, logID string
 		if gfa, ok := args.(interface{ GetFirstArgument() interface{} }); ok {
-			baseReq := reflect.ValueOf(gfa).Elem().FieldByName("Base").Interface()
-			if base, ok := baseReq.(interface {
-				GetLogID() string
-				GetTraceID() string
-				GetSpanID() string
-			}); ok {
-				logID = base.GetLogID()
-				traceID = base.GetTraceID()
-				spanID = base.GetSpanID()
-			}
+	        if baseReq := getBaseReq(gfa.GetFirstArgument()); baseReq != nil {
+	            logID = baseReq.GetLogID()
+                traceID = baseReq.GetTraceID()
+                spanID = baseReq.GetSpanID()
+	        }
 		}
 
 		if logID == "" {
@@ -50,4 +51,26 @@ func ServerTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 
 		return nil
 	}
+}
+
+func getBaseReq(firstArg interface{}) BaseReq {
+	req := reflect.ValueOf(firstArg)
+	if req.Kind() == reflect.Ptr {
+	    if req.IsNil() {
+            return nil
+        }
+        req = req.Elem()
+	}
+	if req.Kind() != reflect.Struct {
+	    return nil
+	}
+
+	if _, ok := req.Type().FieldByName("Base"); ok {
+	    if result, ok :=  req.FieldByName("Base").Interface().(BaseReq); ok {
+			return result
+		}
+		return nil
+	}
+
+	return nil
 }
