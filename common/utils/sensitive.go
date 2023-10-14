@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"reflect"
 )
 
@@ -21,12 +20,7 @@ func NewSensitiveMarshal(words ...string) *SensitiveMarshal {
 }
 
 func (sm *SensitiveMarshal) SafeMarshal(obj interface{}) string {
-	data, err := json.Marshal(sm.sensitiveMarshal(obj))
-	if err != nil {
-		return "{}"
-	}
-
-	return string(data)
+	return SafeJson(sm.sensitiveMarshal(obj))
 }
 
 func (sm *SensitiveMarshal) sensitiveMarshal(obj interface{}) interface{} {

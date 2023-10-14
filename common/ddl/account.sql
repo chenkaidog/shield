@@ -12,6 +12,7 @@ CREATE TABLE `account`
     `status`     VARCHAR(32)     NOT NULL COMMENT '帐号状态',
     `created_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted_at` DATETIME NULL COMMENT '',
     PRIMARY KEY (`id`),
     UNIQUE INDEX `uniq_account_id` (`account_id`),
     UNIQUE INDEX `uniq_username` (`username`),
@@ -32,6 +33,7 @@ CREATE TABLE `user`
     `description` VARCHAR(256)    NULL COMMENT '用户描述',
     `created_at`  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at`  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted_at` DATETIME NULL COMMENT '',
     PRIMARY KEY (`id`),
     UNIQUE INDEX `uniq_user_id` (`user_id`),
     UNIQUE INDEX `uniq_account_id` (`account_id`),
@@ -49,6 +51,10 @@ CREATE TABLE `login_record`
   `device`    VARCHAR(64)     NOT NULL COMMENT '',
   `reason`    VARCHAR(64)     NOT NULL COMMENT '',
   `status`    VARCHAR(32)     NOT NULL COMMENT '',
+  `description` VARCHAR(256)    NULL COMMENT '用户描述',
+  `created_at`  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at`  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted_at` DATETIME NULL COMMENT '',
   PRIMARY KEY (`id`),
   INDEX `idx_username_login_at` (`account_id`, `login_at`)
 ) ENGINE = INNODB

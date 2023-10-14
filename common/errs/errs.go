@@ -10,33 +10,33 @@ type Error interface {
 	SetMsg(msg string) Error
 }
 
-type BizError struct {
+type bizError struct {
 	code int32
 	msg  string
 }
 
-func (err *BizError) Error() string {
+func (err *bizError) Error() string {
 	return fmt.Sprintf("%d:%s", err.code, err.msg)
 }
 
-func (err *BizError) Code() int32 {
+func (err *bizError) Code() int32 {
 	return err.code
 }
 
-func (err *BizError) Msg() string {
+func (err *bizError) Msg() string {
 	return err.msg
 }
 
-func (bizErr *BizError) SetErr(err error) Error {
+func (bizErr *bizError) SetErr(err error) Error {
 	return New(bizErr.Code(), err.Error())
 }
 
-func (bizErr *BizError) SetMsg(msg string) Error {
+func (bizErr *bizError) SetMsg(msg string) Error {
 	return New(bizErr.Code(), msg)
 }
 
 func New(code int32, msg string) Error {
-	return &BizError{
+	return &bizError{
 		code: code,
 		msg:  msg,
 	}
