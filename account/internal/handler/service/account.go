@@ -59,7 +59,6 @@ func UpdateAccountPassword(ctx context.Context, req *domain.AccountPswUpdateReq)
 
 	if !utils.PasswordVerify(account.Salt, account.Password, req.Password) {
 		// 验证不通过
-		logs.CtxInfo(ctx, "password incorrect")
 		return errs.PasswordIncorrect
 	}
 
