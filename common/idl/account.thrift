@@ -33,6 +33,7 @@ struct AccountCreateReq {
 }
 
 struct AccountCreateResp {
+    1: optional string accountID
     255: required base.BaseResp base
 }
 

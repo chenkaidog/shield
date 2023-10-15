@@ -64,4 +64,8 @@ var (
 	DbError             = New(1_0003, "db error")
 	RecordNotFoundError = New(1_0004, "record not found error")
 	DbDuplicateError    = New(1_0005, "db key duplicate error")
+
+	UsernameDuplidateError = New(2_0001, "username already exists")
+	AccountNotExistError = New(2_0002, "account not exist")
+	PasswordIncorrect = New(2_0003, "password incorrect")
 )
