@@ -231,10 +231,6 @@ func (p *UserCreateReq) IsValid() error {
 	if ok, _ := regexp.MatchString(_src, p.AccountID); !ok {
 		return fmt.Errorf("field AccountID pattern rule failed, current value: %v", p.AccountID)
 	}
-	_src1 := "^\\w{8,128}$"
-	if ok, _ := regexp.MatchString(_src1, p.UserID); !ok {
-		return fmt.Errorf("field UserID pattern rule failed, current value: %v", p.UserID)
-	}
 	_src2 := "^[\\p{Han}a-zA-Z\\s]{1,128}$"
 	if ok, _ := regexp.MatchString(_src2, p.Name); !ok {
 		return fmt.Errorf("field Name pattern rule failed, current value: %v", p.Name)

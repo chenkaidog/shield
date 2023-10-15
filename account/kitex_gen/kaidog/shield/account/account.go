@@ -5832,12 +5832,11 @@ func (p *User) Field201DeepEqual(src int64) bool {
 
 type UserCreateReq struct {
 	AccountID   string         `thrift:"accountID,1,required" frugal:"1,required,string" json:"accountID"`
-	UserID      string         `thrift:"userID,2,required" frugal:"2,required,string" json:"userID"`
-	Name        string         `thrift:"name,3,required" frugal:"3,required,string" json:"name"`
-	Gender      Gender         `thrift:"gender,4,required" frugal:"4,required,Gender" json:"gender"`
-	Phone       string         `thrift:"phone,5,required" frugal:"5,required,string" json:"phone"`
-	Email       string         `thrift:"email,6,required" frugal:"6,required,string" json:"email"`
-	Description string         `thrift:"description,7,required" frugal:"7,required,string" json:"description"`
+	Name        string         `thrift:"name,2,required" frugal:"2,required,string" json:"name"`
+	Gender      Gender         `thrift:"gender,3,required" frugal:"3,required,Gender" json:"gender"`
+	Phone       string         `thrift:"phone,4,required" frugal:"4,required,string" json:"phone"`
+	Email       string         `thrift:"email,5,required" frugal:"5,required,string" json:"email"`
+	Description string         `thrift:"description,6,required" frugal:"6,required,string" json:"description"`
 	Base        *base.BaseResp `thrift:"base,255,required" frugal:"255,required,base.BaseResp" json:"base"`
 }
 
@@ -5851,10 +5850,6 @@ func (p *UserCreateReq) InitDefault() {
 
 func (p *UserCreateReq) GetAccountID() (v string) {
 	return p.AccountID
-}
-
-func (p *UserCreateReq) GetUserID() (v string) {
-	return p.UserID
 }
 
 func (p *UserCreateReq) GetName() (v string) {
@@ -5888,9 +5883,6 @@ func (p *UserCreateReq) GetBase() (v *base.BaseResp) {
 func (p *UserCreateReq) SetAccountID(val string) {
 	p.AccountID = val
 }
-func (p *UserCreateReq) SetUserID(val string) {
-	p.UserID = val
-}
 func (p *UserCreateReq) SetName(val string) {
 	p.Name = val
 }
@@ -5912,12 +5904,11 @@ func (p *UserCreateReq) SetBase(val *base.BaseResp) {
 
 var fieldIDToName_UserCreateReq = map[int16]string{
 	1:   "accountID",
-	2:   "userID",
-	3:   "name",
-	4:   "gender",
-	5:   "phone",
-	6:   "email",
-	7:   "description",
+	2:   "name",
+	3:   "gender",
+	4:   "phone",
+	5:   "email",
+	6:   "description",
 	255: "base",
 }
 
@@ -5930,7 +5921,6 @@ func (p *UserCreateReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetAccountID bool = false
-	var issetUserID bool = false
 	var issetName bool = false
 	var issetGender bool = false
 	var issetPhone bool = false
@@ -5968,29 +5958,29 @@ func (p *UserCreateReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetUserID = true
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
 				issetName = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
 				}
 			}
-		case 4:
+		case 3:
 			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField4(iprot); err != nil {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetGender = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetPhone = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -6001,7 +5991,7 @@ func (p *UserCreateReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetPhone = true
+				issetEmail = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -6010,17 +6000,6 @@ func (p *UserCreateReq) Read(iprot thrift.TProtocol) (err error) {
 		case 6:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField6(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetEmail = true
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 7:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetDescription = true
@@ -6059,33 +6038,28 @@ func (p *UserCreateReq) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetUserID {
+	if !issetName {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetName {
+	if !issetGender {
 		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetGender {
+	if !issetPhone {
 		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetPhone {
+	if !issetEmail {
 		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetEmail {
-		fieldId = 6
-		goto RequiredFieldNotSetError
-	}
-
 	if !issetDescription {
-		fieldId = 7
+		fieldId = 6
 		goto RequiredFieldNotSetError
 	}
 
@@ -6124,21 +6098,12 @@ func (p *UserCreateReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.UserID = v
-	}
-	return nil
-}
-
-func (p *UserCreateReq) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
 		p.Name = v
 	}
 	return nil
 }
 
-func (p *UserCreateReq) ReadField4(iprot thrift.TProtocol) error {
+func (p *UserCreateReq) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -6147,7 +6112,7 @@ func (p *UserCreateReq) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserCreateReq) ReadField5(iprot thrift.TProtocol) error {
+func (p *UserCreateReq) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -6156,7 +6121,7 @@ func (p *UserCreateReq) ReadField5(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserCreateReq) ReadField6(iprot thrift.TProtocol) error {
+func (p *UserCreateReq) ReadField5(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -6165,7 +6130,7 @@ func (p *UserCreateReq) ReadField6(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserCreateReq) ReadField7(iprot thrift.TProtocol) error {
+func (p *UserCreateReq) ReadField6(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -6212,10 +6177,6 @@ func (p *UserCreateReq) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 6
 			goto WriteFieldError
 		}
-		if err = p.writeField7(oprot); err != nil {
-			fieldId = 7
-			goto WriteFieldError
-		}
 		if err = p.writeField255(oprot); err != nil {
 			fieldId = 255
 			goto WriteFieldError
@@ -6257,10 +6218,10 @@ WriteFieldEndError:
 }
 
 func (p *UserCreateReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userID", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("name", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UserID); err != nil {
+	if err := oprot.WriteString(p.Name); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -6274,10 +6235,10 @@ WriteFieldEndError:
 }
 
 func (p *UserCreateReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("name", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("gender", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Name); err != nil {
+	if err := oprot.WriteI32(int32(p.Gender)); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -6291,10 +6252,10 @@ WriteFieldEndError:
 }
 
 func (p *UserCreateReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("gender", thrift.I32, 4); err != nil {
+	if err = oprot.WriteFieldBegin("phone", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(int32(p.Gender)); err != nil {
+	if err := oprot.WriteString(p.Phone); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -6308,10 +6269,10 @@ WriteFieldEndError:
 }
 
 func (p *UserCreateReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("phone", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("email", thrift.STRING, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Phone); err != nil {
+	if err := oprot.WriteString(p.Email); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -6325,24 +6286,7 @@ WriteFieldEndError:
 }
 
 func (p *UserCreateReq) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("email", thrift.STRING, 6); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Email); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
-}
-
-func (p *UserCreateReq) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("description", thrift.STRING, 7); err != nil {
+	if err = oprot.WriteFieldBegin("description", thrift.STRING, 6); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.Description); err != nil {
@@ -6353,9 +6297,9 @@ func (p *UserCreateReq) writeField7(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
 }
 
 func (p *UserCreateReq) writeField255(oprot thrift.TProtocol) (err error) {
@@ -6391,22 +6335,19 @@ func (p *UserCreateReq) DeepEqual(ano *UserCreateReq) bool {
 	if !p.Field1DeepEqual(ano.AccountID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.UserID) {
+	if !p.Field2DeepEqual(ano.Name) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Name) {
+	if !p.Field3DeepEqual(ano.Gender) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.Gender) {
+	if !p.Field4DeepEqual(ano.Phone) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.Phone) {
+	if !p.Field5DeepEqual(ano.Email) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.Email) {
-		return false
-	}
-	if !p.Field7DeepEqual(ano.Description) {
+	if !p.Field6DeepEqual(ano.Description) {
 		return false
 	}
 	if !p.Field255DeepEqual(ano.Base) {
@@ -6424,40 +6365,33 @@ func (p *UserCreateReq) Field1DeepEqual(src string) bool {
 }
 func (p *UserCreateReq) Field2DeepEqual(src string) bool {
 
-	if strings.Compare(p.UserID, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *UserCreateReq) Field3DeepEqual(src string) bool {
-
 	if strings.Compare(p.Name, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *UserCreateReq) Field4DeepEqual(src Gender) bool {
+func (p *UserCreateReq) Field3DeepEqual(src Gender) bool {
 
 	if p.Gender != src {
 		return false
 	}
 	return true
 }
-func (p *UserCreateReq) Field5DeepEqual(src string) bool {
+func (p *UserCreateReq) Field4DeepEqual(src string) bool {
 
 	if strings.Compare(p.Phone, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *UserCreateReq) Field6DeepEqual(src string) bool {
+func (p *UserCreateReq) Field5DeepEqual(src string) bool {
 
 	if strings.Compare(p.Email, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *UserCreateReq) Field7DeepEqual(src string) bool {
+func (p *UserCreateReq) Field6DeepEqual(src string) bool {
 
 	if strings.Compare(p.Description, src) != 0 {
 		return false
@@ -6473,7 +6407,8 @@ func (p *UserCreateReq) Field255DeepEqual(src *base.BaseResp) bool {
 }
 
 type UserCreateResp struct {
-	Base *base.BaseResp `thrift:"base,255,required" frugal:"255,required,base.BaseResp" json:"base"`
+	UserID *string        `thrift:"userID,1,optional" frugal:"1,optional,string" json:"userID,omitempty"`
+	Base   *base.BaseResp `thrift:"base,255,required" frugal:"255,required,base.BaseResp" json:"base"`
 }
 
 func NewUserCreateResp() *UserCreateResp {
@@ -6484,6 +6419,15 @@ func (p *UserCreateResp) InitDefault() {
 	*p = UserCreateResp{}
 }
 
+var UserCreateResp_UserID_DEFAULT string
+
+func (p *UserCreateResp) GetUserID() (v string) {
+	if !p.IsSetUserID() {
+		return UserCreateResp_UserID_DEFAULT
+	}
+	return *p.UserID
+}
+
 var UserCreateResp_Base_DEFAULT *base.BaseResp
 
 func (p *UserCreateResp) GetBase() (v *base.BaseResp) {
@@ -6492,12 +6436,20 @@ func (p *UserCreateResp) GetBase() (v *base.BaseResp) {
 	}
 	return p.Base
 }
+func (p *UserCreateResp) SetUserID(val *string) {
+	p.UserID = val
+}
 func (p *UserCreateResp) SetBase(val *base.BaseResp) {
 	p.Base = val
 }
 
 var fieldIDToName_UserCreateResp = map[int16]string{
+	1:   "userID",
 	255: "base",
+}
+
+func (p *UserCreateResp) IsSetUserID() bool {
+	return p.UserID != nil
 }
 
 func (p *UserCreateResp) IsSetBase() bool {
@@ -6524,6 +6476,16 @@ func (p *UserCreateResp) Read(iprot thrift.TProtocol) (err error) {
 		}
 
 		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
 		case 255:
 			if fieldTypeId == thrift.STRUCT {
 				if err = p.ReadField255(iprot); err != nil {
@@ -6571,6 +6533,15 @@ RequiredFieldNotSetError:
 	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_UserCreateResp[fieldId]))
 }
 
+func (p *UserCreateResp) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.UserID = &v
+	}
+	return nil
+}
+
 func (p *UserCreateResp) ReadField255(iprot thrift.TProtocol) error {
 	p.Base = base.NewBaseResp()
 	if err := p.Base.Read(iprot); err != nil {
@@ -6585,6 +6556,10 @@ func (p *UserCreateResp) Write(oprot thrift.TProtocol) (err error) {
 		goto WriteStructBeginError
 	}
 	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
 		if err = p.writeField255(oprot); err != nil {
 			fieldId = 255
 			goto WriteFieldError
@@ -6606,6 +6581,25 @@ WriteFieldStopError:
 	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
 WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *UserCreateResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if p.IsSetUserID() {
+		if err = oprot.WriteFieldBegin("userID", thrift.STRING, 1); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.UserID); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
 func (p *UserCreateResp) writeField255(oprot thrift.TProtocol) (err error) {
@@ -6638,12 +6632,27 @@ func (p *UserCreateResp) DeepEqual(ano *UserCreateResp) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
+	if !p.Field1DeepEqual(ano.UserID) {
+		return false
+	}
 	if !p.Field255DeepEqual(ano.Base) {
 		return false
 	}
 	return true
 }
 
+func (p *UserCreateResp) Field1DeepEqual(src *string) bool {
+
+	if p.UserID == src {
+		return true
+	} else if p.UserID == nil || src == nil {
+		return false
+	}
+	if strings.Compare(*p.UserID, *src) != 0 {
+		return false
+	}
+	return true
+}
 func (p *UserCreateResp) Field255DeepEqual(src *base.BaseResp) bool {
 
 	if !p.Base.DeepEqual(src) {
