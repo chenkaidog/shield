@@ -68,4 +68,6 @@ var (
 	UsernameDuplidateError = New(2_0001, "username already exists")
 	AccountNotExistError = New(2_0002, "account not exist")
 	PasswordIncorrect = New(2_0003, "password incorrect")
+	UserDuplicateError = New(2_0004, "user of account already exist")
+	AccountInvalidError = New(2_0005, "account is invalid")
 )

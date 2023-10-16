@@ -136,17 +136,17 @@ struct User {
 
 struct UserCreateReq {
     1: required string accountID (vt.pattern="^\\w{8,128}$")
-    2: required string userID (vt.pattern="^\\w{8,128}$")
-    3: required string name (vt.pattern="^[\\p{Han}a-zA-Z\\s]{1,128}$")
-    4: required Gender gender (vt.in="Gender.male", vt.in="Gender.female", vt.in="Gender.others")
-    5: required string phone (vt.pattern="^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$")
-    6: required string email (vt.pattern="^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")
-    7: required string description (vt.max_size="256")
+    2: required string name (vt.pattern="^[\\p{Han}a-zA-Z\\s]{1,128}$")
+    3: required Gender gender (vt.in="Gender.male", vt.in="Gender.female", vt.in="Gender.others")
+    4: required string phone (vt.pattern="^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$")
+    5: required string email (vt.pattern="^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")
+    6: required string description (vt.max_size="256")
 
     255: required base.BaseResp base
 }
 
 struct UserCreateResp {
+    1: optional string userID
     255: required base.BaseResp base
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	sensitiveMarshal = utils.NewSensitiveMarshal("password")
+	sensitiveMarshal = utils.NewSensitiveMarshal("password", "newPassword")
 }
 
 var sensitiveMarshal *utils.SensitiveMarshal
