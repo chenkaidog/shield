@@ -1,0 +1,5 @@
+gen_service:
+    kitex --thrift-plugin validator -service kaidog.shield.account ../common/idl/account.thrift
+
+unit_test:
+    go test -v -run "Test*" `go list ./...` -coverprofile=c.out -coverpkg=$(go list ./... | tr "\n" ",")
