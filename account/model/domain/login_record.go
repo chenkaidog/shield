@@ -8,7 +8,7 @@ type LoginRecord struct {
 	IPv4      string
 	Device    string
 	Reason    string
-	Status    string
+	Status    LoginStatus
 }
 
 type LoginStatus string

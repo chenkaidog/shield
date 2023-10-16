@@ -63,4 +63,24 @@ func Login(ctx context.Context, req *domain.LoginReq) (string, errs.Error) {
 	return account.AccountID, nil
 }
 
-func QueryLoginRecord(ctx context.Context, req *domain.LoginRecordQueryReq)
+func QueryLoginRecord(ctx context.Context, req *domain.LoginRecordQueryReq) ([]*domain.LoginRecord, int64, errs.Error) {
+	limit, offset := req.Size, (req.Page-1)*req.Size
+	recordList, total, err := repos.SelectLoginRecord(ctx, req.AccountID, int(limit), int(offset))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var result []*domain.LoginRecord
+	for _, record := range recordList {
+		result = append(result, &domain.LoginRecord{
+			AccountID: record.AccountID,
+			LoginAt:   record.LoginAt,
+			IPv4:      record.IPv4,
+			Device:    record.Device,
+			Reason:    record.Reason,
+			Status:    domain.LoginStatus(record.Status),
+		})
+	}
+
+	return result, total, nil
+}
