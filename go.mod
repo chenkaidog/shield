@@ -10,10 +10,10 @@ require (
 	github.com/cloudwego/kitex v0.7.2
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/uuid v1.3.1
-	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.2
 	gopkg.in/yaml.v3 v3.0.1
+	gorm.io/driver/mysql v1.5.2
 	gorm.io/gorm v1.25.5
 )
 
@@ -55,5 +55,4 @@ require (
 	golang.org/x/text v0.6.0 // indirect
 	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
-	gorm.io/driver/mysql v1.5.2
 )

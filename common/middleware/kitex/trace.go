@@ -4,16 +4,16 @@ import (
 	"context"
 	"reflect"
 	"shield/common/constant"
-	"shield/common/utils"
+	"shield/common/utils/idgen"
 
 	"github.com/cloudwego/kitex/pkg/endpoint"
 )
 
 func init() {
-	idGen = utils.NewIDGenerator(100)
+	idGen = idgen.NewIDGenerator(100)
 }
 
-var idGen *utils.IDGenerator
+var idGen *idgen.IDGenerator
 
 type BaseReq interface {
     GetLogID() string

@@ -4,11 +4,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 
-	"shield/common/utils"
+	"shield/common/utils/idgen"
 )
 
 func EncodePassword(password string) (salt string, passwordHash string) {
-	salt = utils.NewUUID()
+	salt = idgen.NewUUID()
 	h := sha256.New()
 
 	h.Write([]byte(salt))

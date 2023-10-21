@@ -8,7 +8,7 @@ import (
 	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
-	common_utils "shield/common/utils"
+	 "shield/common/utils/idgen"
 )
 
 func CreateAccount(ctx context.Context, req *domain.AccountCreateReq) (*domain.Account, errs.Error) {
@@ -24,7 +24,7 @@ func CreateAccount(ctx context.Context, req *domain.AccountCreateReq) (*domain.A
 
 	// 2、密码编码并创建账号
 	salt, password := utils.EncodePassword(req.Password)
-	accountID := common_utils.NewUUID()
+	accountID := idgen.NewUUID()
 	defaultStatus := domain.AccountStatusValid
 	if err = repos.CreateAccount(ctx, &po.Account{
 		AccountID: accountID,

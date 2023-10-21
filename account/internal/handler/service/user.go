@@ -6,11 +6,11 @@ import (
 	"shield/account/model/domain"
 	"shield/account/model/po"
 	"shield/common/errs"
-	common_utils "shield/common/utils"
+	"shield/common/utils/idgen"
 )
 
 func CreateUser(ctx context.Context, req *domain.UserCreateReq) (string, errs.Error) {
-	userID := common_utils.NewUUID()
+	userID := idgen.NewUUID()
 	err := repos.CreateUser(ctx, &po.User{
 		UserID:      userID,
 		AccountID:   req.AccountID,

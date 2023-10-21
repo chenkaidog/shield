@@ -2,7 +2,6 @@ package logs
 
 import (
 	"context"
-	"os"
 	"shield/common/constant"
 	"testing"
 )
@@ -22,5 +21,5 @@ func TestLogrus(t *testing.T) {
 
 	Info("test3")
 
-	t.Log(os.Getwd())
+	CtxInfo(ctx, "123 %s, %+v", "123", 123)
 }
