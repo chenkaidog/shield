@@ -2,7 +2,7 @@ package gorm_utils
 
 import (
 	"github.com/go-sql-driver/mysql"
-	// "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 )
 
 func IsEntryDuplicateErr(err error) bool {
@@ -12,11 +12,11 @@ func IsEntryDuplicateErr(err error) bool {
 		}
 	}
 
-	// if sqliteErr, ok := err.(sqlite3.Error); ok {
-	// 	if sqliteErr.Code == sqlite3.ErrConstraint {
-	// 		return true
-	// 	}
-	// }
+	if sqliteErr, ok := err.(sqlite3.Error); ok {
+		if sqliteErr.Code == sqlite3.ErrConstraint {
+			return true
+		}
+	}
 
 	return false
 }
