@@ -21,7 +21,7 @@ func CreateAccount(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(gateway.AccountCreateResp)
+	resp := new(gateway.BaseResp)
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -37,7 +37,7 @@ func CreateUser(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(gateway.UserCreateResp)
+	resp := new(gateway.BaseResp)
 
 	c.JSON(consts.StatusOK, resp)
 }

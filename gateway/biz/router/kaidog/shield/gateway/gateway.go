@@ -17,14 +17,20 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.POST("/create_account", append(_createaccountMw(), gateway.CreateAccount)...)
-	root.POST("/create_user", append(_createuserMw(), gateway.CreateUser)...)
-	root.POST("/login", append(_loginMw(), gateway.Login)...)
-	root.GET("/login_record", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
-	root.POST("/logout", append(_logoutMw(), gateway.Logout)...)
-	root.POST("/rest_password", append(_resetpasswordMw(), gateway.ResetPassword)...)
-	root.POST("/switch_account_status", append(_switchaccountstatusMw(), gateway.SwitchAccountStatus)...)
-	root.POST("/update_password", append(_updatepasswordMw(), gateway.UpdatePassword)...)
-	root.POST("/update_user", append(_updateuserinfoMw(), gateway.UpdateUserInfo)...)
-	root.GET("/user_info", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
+	root.POST("/userupdate_password", append(_updatepasswordMw(), gateway.UpdatePassword)...)
+	{
+		_admin := root.Group("/admin", _adminMw()...)
+		_admin.POST("/create_account", append(_createaccountMw(), gateway.CreateAccount)...)
+		_admin.POST("/create_user", append(_createuserMw(), gateway.CreateUser)...)
+		_admin.POST("/rest_password", append(_resetpasswordMw(), gateway.ResetPassword)...)
+		_admin.POST("/switch_account_status", append(_switchaccountstatusMw(), gateway.SwitchAccountStatus)...)
+		_admin.POST("/update_user", append(_updateuserinfoMw(), gateway.UpdateUserInfo)...)
+	}
+	{
+		_user := root.Group("/user", _userMw()...)
+		_user.POST("/login", append(_loginMw(), gateway.Login)...)
+		_user.GET("/login_record", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
+		_user.POST("/logout", append(_logoutMw(), gateway.Logout)...)
+		_user.GET("/user_info", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
+	}
 }

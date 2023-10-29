@@ -21,7 +21,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(gateway.LoginResp)
+	resp := new(gateway.BaseResp)
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -53,7 +53,7 @@ func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(gateway.UserInfoQueryResp)
+	resp := new(gateway.BaseResp)
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -69,7 +69,7 @@ func QueryLoginRecord(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(gateway.LoginRecordQueryResp)
+	resp := new(gateway.BaseResp)
 
 	c.JSON(consts.StatusOK, resp)
 }

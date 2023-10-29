@@ -11,5 +11,4 @@ import (
 func GeneratedRegister(r *server.Hertz) {
 	//INSERT_POINT: DO NOT DELETE THIS LINE!
 	kaidog_shield_gateway.Register(r)
-
 }

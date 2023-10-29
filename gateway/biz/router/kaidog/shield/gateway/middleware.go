@@ -41,6 +41,11 @@ func _resetpasswordMw() []app.HandlerFunc {
 	return nil
 }
 
+func _switchaccountstatusMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _updatepasswordMw() []app.HandlerFunc {
 	// your code...
 	return nil
@@ -56,7 +61,12 @@ func _queryuserinfoMw() []app.HandlerFunc {
 	return nil
 }
 
-func _switchaccountstatusMw() []app.HandlerFunc {
+func _adminMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

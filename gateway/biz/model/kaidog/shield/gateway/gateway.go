@@ -4337,13 +4337,13 @@ func (p *AccountStatusSwitchReq) String() string {
 }
 
 type UserService interface {
-	Login(ctx context.Context, req *LoginReq) (r *LoginResp, err error)
+	Login(ctx context.Context, req *LoginReq) (r *BaseResp, err error)
 
 	Logout(ctx context.Context, req *LogoutReq) (r *BaseResp, err error)
 
-	QueryUserInfo(ctx context.Context, req *UserInfoQueryReq) (r *UserInfoQueryResp, err error)
+	QueryUserInfo(ctx context.Context, req *UserInfoQueryReq) (r *BaseResp, err error)
 
-	QueryLoginRecord(ctx context.Context, req *LoginRecordQueryReq) (r *LoginRecordQueryResp, err error)
+	QueryLoginRecord(ctx context.Context, req *LoginRecordQueryReq) (r *BaseResp, err error)
 
 	UpdatePassword(ctx context.Context, req *PasswordUpdateReq) (r *BaseResp, err error)
 }
@@ -4374,7 +4374,7 @@ func (p *UserServiceClient) Client_() thrift.TClient {
 	return p.c
 }
 
-func (p *UserServiceClient) Login(ctx context.Context, req *LoginReq) (r *LoginResp, err error) {
+func (p *UserServiceClient) Login(ctx context.Context, req *LoginReq) (r *BaseResp, err error) {
 	var _args UserServiceLoginArgs
 	_args.Req = req
 	var _result UserServiceLoginResult
@@ -4392,7 +4392,7 @@ func (p *UserServiceClient) Logout(ctx context.Context, req *LogoutReq) (r *Base
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *UserServiceClient) QueryUserInfo(ctx context.Context, req *UserInfoQueryReq) (r *UserInfoQueryResp, err error) {
+func (p *UserServiceClient) QueryUserInfo(ctx context.Context, req *UserInfoQueryReq) (r *BaseResp, err error) {
 	var _args UserServiceQueryUserInfoArgs
 	_args.Req = req
 	var _result UserServiceQueryUserInfoResult
@@ -4401,7 +4401,7 @@ func (p *UserServiceClient) QueryUserInfo(ctx context.Context, req *UserInfoQuer
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *UserServiceClient) QueryLoginRecord(ctx context.Context, req *LoginRecordQueryReq) (r *LoginRecordQueryResp, err error) {
+func (p *UserServiceClient) QueryLoginRecord(ctx context.Context, req *LoginRecordQueryReq) (r *BaseResp, err error) {
 	var _args UserServiceQueryLoginRecordArgs
 	_args.Req = req
 	var _result UserServiceQueryLoginRecordResult
@@ -4421,9 +4421,9 @@ func (p *UserServiceClient) UpdatePassword(ctx context.Context, req *PasswordUpd
 }
 
 type AdminService interface {
-	CreateAccount(ctx context.Context, req *AccountCreateReq) (r *AccountCreateResp, err error)
+	CreateAccount(ctx context.Context, req *AccountCreateReq) (r *BaseResp, err error)
 
-	CreateUser(ctx context.Context, req *UserCreateReq) (r *UserCreateResp, err error)
+	CreateUser(ctx context.Context, req *UserCreateReq) (r *BaseResp, err error)
 
 	UpdateUserInfo(ctx context.Context, req *UserInfoUpdateReq) (r *BaseResp, err error)
 
@@ -4458,7 +4458,7 @@ func (p *AdminServiceClient) Client_() thrift.TClient {
 	return p.c
 }
 
-func (p *AdminServiceClient) CreateAccount(ctx context.Context, req *AccountCreateReq) (r *AccountCreateResp, err error) {
+func (p *AdminServiceClient) CreateAccount(ctx context.Context, req *AccountCreateReq) (r *BaseResp, err error) {
 	var _args AdminServiceCreateAccountArgs
 	_args.Req = req
 	var _result AdminServiceCreateAccountResult
@@ -4467,7 +4467,7 @@ func (p *AdminServiceClient) CreateAccount(ctx context.Context, req *AccountCrea
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *AdminServiceClient) CreateUser(ctx context.Context, req *UserCreateReq) (r *UserCreateResp, err error) {
+func (p *AdminServiceClient) CreateUser(ctx context.Context, req *UserCreateReq) (r *BaseResp, err error) {
 	var _args AdminServiceCreateUserArgs
 	_args.Req = req
 	var _result AdminServiceCreateUserResult
@@ -4568,7 +4568,7 @@ func (p *userServiceProcessorLogin) Process(ctx context.Context, seqId int32, ip
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := UserServiceLoginResult{}
-	var retval *LoginResp
+	var retval *BaseResp
 	if retval, err2 = p.handler.Login(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Login: "+err2.Error())
 		oprot.WriteMessageBegin("Login", thrift.EXCEPTION, seqId)
@@ -4664,7 +4664,7 @@ func (p *userServiceProcessorQueryUserInfo) Process(ctx context.Context, seqId i
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := UserServiceQueryUserInfoResult{}
-	var retval *UserInfoQueryResp
+	var retval *BaseResp
 	if retval, err2 = p.handler.QueryUserInfo(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing QueryUserInfo: "+err2.Error())
 		oprot.WriteMessageBegin("QueryUserInfo", thrift.EXCEPTION, seqId)
@@ -4712,7 +4712,7 @@ func (p *userServiceProcessorQueryLoginRecord) Process(ctx context.Context, seqI
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := UserServiceQueryLoginRecordResult{}
-	var retval *LoginRecordQueryResp
+	var retval *BaseResp
 	if retval, err2 = p.handler.QueryLoginRecord(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing QueryLoginRecord: "+err2.Error())
 		oprot.WriteMessageBegin("QueryLoginRecord", thrift.EXCEPTION, seqId)
@@ -4935,16 +4935,16 @@ func (p *UserServiceLoginArgs) String() string {
 }
 
 type UserServiceLoginResult struct {
-	Success *LoginResp `thrift:"success,0,optional"`
+	Success *BaseResp `thrift:"success,0,optional"`
 }
 
 func NewUserServiceLoginResult() *UserServiceLoginResult {
 	return &UserServiceLoginResult{}
 }
 
-var UserServiceLoginResult_Success_DEFAULT *LoginResp
+var UserServiceLoginResult_Success_DEFAULT *BaseResp
 
-func (p *UserServiceLoginResult) GetSuccess() (v *LoginResp) {
+func (p *UserServiceLoginResult) GetSuccess() (v *BaseResp) {
 	if !p.IsSetSuccess() {
 		return UserServiceLoginResult_Success_DEFAULT
 	}
@@ -5019,7 +5019,7 @@ ReadStructEndError:
 }
 
 func (p *UserServiceLoginResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewLoginResp()
+	p.Success = NewBaseResp()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
@@ -5519,16 +5519,16 @@ func (p *UserServiceQueryUserInfoArgs) String() string {
 }
 
 type UserServiceQueryUserInfoResult struct {
-	Success *UserInfoQueryResp `thrift:"success,0,optional"`
+	Success *BaseResp `thrift:"success,0,optional"`
 }
 
 func NewUserServiceQueryUserInfoResult() *UserServiceQueryUserInfoResult {
 	return &UserServiceQueryUserInfoResult{}
 }
 
-var UserServiceQueryUserInfoResult_Success_DEFAULT *UserInfoQueryResp
+var UserServiceQueryUserInfoResult_Success_DEFAULT *BaseResp
 
-func (p *UserServiceQueryUserInfoResult) GetSuccess() (v *UserInfoQueryResp) {
+func (p *UserServiceQueryUserInfoResult) GetSuccess() (v *BaseResp) {
 	if !p.IsSetSuccess() {
 		return UserServiceQueryUserInfoResult_Success_DEFAULT
 	}
@@ -5603,7 +5603,7 @@ ReadStructEndError:
 }
 
 func (p *UserServiceQueryUserInfoResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewUserInfoQueryResp()
+	p.Success = NewBaseResp()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
@@ -5811,16 +5811,16 @@ func (p *UserServiceQueryLoginRecordArgs) String() string {
 }
 
 type UserServiceQueryLoginRecordResult struct {
-	Success *LoginRecordQueryResp `thrift:"success,0,optional"`
+	Success *BaseResp `thrift:"success,0,optional"`
 }
 
 func NewUserServiceQueryLoginRecordResult() *UserServiceQueryLoginRecordResult {
 	return &UserServiceQueryLoginRecordResult{}
 }
 
-var UserServiceQueryLoginRecordResult_Success_DEFAULT *LoginRecordQueryResp
+var UserServiceQueryLoginRecordResult_Success_DEFAULT *BaseResp
 
-func (p *UserServiceQueryLoginRecordResult) GetSuccess() (v *LoginRecordQueryResp) {
+func (p *UserServiceQueryLoginRecordResult) GetSuccess() (v *BaseResp) {
 	if !p.IsSetSuccess() {
 		return UserServiceQueryLoginRecordResult_Success_DEFAULT
 	}
@@ -5895,7 +5895,7 @@ ReadStructEndError:
 }
 
 func (p *UserServiceQueryLoginRecordResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewLoginRecordQueryResp()
+	p.Success = NewBaseResp()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
@@ -6313,7 +6313,7 @@ func (p *adminServiceProcessorCreateAccount) Process(ctx context.Context, seqId 
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := AdminServiceCreateAccountResult{}
-	var retval *AccountCreateResp
+	var retval *BaseResp
 	if retval, err2 = p.handler.CreateAccount(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing CreateAccount: "+err2.Error())
 		oprot.WriteMessageBegin("CreateAccount", thrift.EXCEPTION, seqId)
@@ -6361,7 +6361,7 @@ func (p *adminServiceProcessorCreateUser) Process(ctx context.Context, seqId int
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := AdminServiceCreateUserResult{}
-	var retval *UserCreateResp
+	var retval *BaseResp
 	if retval, err2 = p.handler.CreateUser(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing CreateUser: "+err2.Error())
 		oprot.WriteMessageBegin("CreateUser", thrift.EXCEPTION, seqId)
@@ -6680,16 +6680,16 @@ func (p *AdminServiceCreateAccountArgs) String() string {
 }
 
 type AdminServiceCreateAccountResult struct {
-	Success *AccountCreateResp `thrift:"success,0,optional"`
+	Success *BaseResp `thrift:"success,0,optional"`
 }
 
 func NewAdminServiceCreateAccountResult() *AdminServiceCreateAccountResult {
 	return &AdminServiceCreateAccountResult{}
 }
 
-var AdminServiceCreateAccountResult_Success_DEFAULT *AccountCreateResp
+var AdminServiceCreateAccountResult_Success_DEFAULT *BaseResp
 
-func (p *AdminServiceCreateAccountResult) GetSuccess() (v *AccountCreateResp) {
+func (p *AdminServiceCreateAccountResult) GetSuccess() (v *BaseResp) {
 	if !p.IsSetSuccess() {
 		return AdminServiceCreateAccountResult_Success_DEFAULT
 	}
@@ -6764,7 +6764,7 @@ ReadStructEndError:
 }
 
 func (p *AdminServiceCreateAccountResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewAccountCreateResp()
+	p.Success = NewBaseResp()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
@@ -6972,16 +6972,16 @@ func (p *AdminServiceCreateUserArgs) String() string {
 }
 
 type AdminServiceCreateUserResult struct {
-	Success *UserCreateResp `thrift:"success,0,optional"`
+	Success *BaseResp `thrift:"success,0,optional"`
 }
 
 func NewAdminServiceCreateUserResult() *AdminServiceCreateUserResult {
 	return &AdminServiceCreateUserResult{}
 }
 
-var AdminServiceCreateUserResult_Success_DEFAULT *UserCreateResp
+var AdminServiceCreateUserResult_Success_DEFAULT *BaseResp
 
-func (p *AdminServiceCreateUserResult) GetSuccess() (v *UserCreateResp) {
+func (p *AdminServiceCreateUserResult) GetSuccess() (v *BaseResp) {
 	if !p.IsSetSuccess() {
 		return AdminServiceCreateUserResult_Success_DEFAULT
 	}
@@ -7056,7 +7056,7 @@ ReadStructEndError:
 }
 
 func (p *AdminServiceCreateUserResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewUserCreateResp()
+	p.Success = NewBaseResp()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
