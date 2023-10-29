@@ -2,9 +2,10 @@ module shield/account
 
 go 1.20
 
-replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
-
-replace shield/common => ../common
+replace (
+	github.com/apache/thrift => github.com/apache/thrift v0.13.0
+	shield/common => ../common
+)
 
 require (
 	github.com/apache/thrift v0.19.0
