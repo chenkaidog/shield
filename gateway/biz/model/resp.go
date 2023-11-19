@@ -23,8 +23,8 @@ func NewSuccessResp(body interface{}) *Response {
 	return resp
 }
 
-func NewFailResp(code int32, msg string)  *Response {
-	resp := &Response{} 
+func NewFailResp(code int32, msg string) *Response {
+	resp := &Response{}
 	resp.Code = code
 	resp.Msg = msg
 	resp.Success = false

@@ -5,29 +5,48 @@ package gateway
 import (
 	"context"
 
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"shield/common/logs"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
+	"shield/gateway/biz/rpc"
+	"shield/gateway/biz/util"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Login .
 // @router /login [POST]
+// 调用account的login接口进行登录
 func Login(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req gateway.LoginReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	rpcResp, bizErr := rpc.Login(ctx,
+		&rpc.LoginReq{
+			Username: req.Username,
+			Password: req.Password,
+			Device:   "",
+			Ipv4:     "",
+		})
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+
+	util.BuildRespSuccess(c, utils.H{"account_id": rpcResp.AccountId})
 }
 
 // Logout .
 // @router /logout [POST]
+// 删除会话信息
 func Logout(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req gateway.LogoutReq

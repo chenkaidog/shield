@@ -11,12 +11,16 @@ import (
 )
 
 func init() {
-	sensitiveMarshal = utils.NewSensitiveMarshal("password", "newPassword")
+	sensitiveMarshal = utils.NewSensitiveMarshal("password")
 }
 
 var sensitiveMarshal *utils.SensitiveMarshal
 
-func ServerLogMW(next endpoint.Endpoint) endpoint.Endpoint {
+func SetSensitiveWord(words ...string) {
+	sensitiveMarshal.AddSensitiveWord(words...)
+}
+
+func KitexLogMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request, response interface{}) error {
 		startTime := time.Now()
 

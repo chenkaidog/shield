@@ -24,35 +24,33 @@ func Login(ctx context.Context, req *domain.LoginReq) (string, errs.Error) {
 
 	if account.Status != string(domain.AccountStatusValid) {
 		// 账户不可用
-		err := errs.AccountInvalidError
-		defer repos.CreateLoginRecord(ctx, &po.LoginRecord{
+		_ = repos.CreateLoginRecord(ctx, &po.LoginRecord{
 			AccountID: account.AccountID,
 			LoginAt:   time.Now(),
 			IPv4:      req.IPv4,
 			Device:    req.Device,
 			Status:    string(domain.LoginStatusFail),
-			Reason:    err.Msg(),
+			Reason:    errs.AccountInvalidError.Msg(),
 		})
 
-		return "", err
+		return "", errs.AccountInvalidError
 	}
 
 	if !utils.PasswordVerify(account.Salt, account.Password, req.Password) {
 		// 验证不通过
-		err := errs.PasswordIncorrect
-		defer repos.CreateLoginRecord(ctx, &po.LoginRecord{
+		_ = repos.CreateLoginRecord(ctx, &po.LoginRecord{
 			AccountID: account.AccountID,
 			LoginAt:   time.Now(),
 			IPv4:      req.IPv4,
 			Device:    req.Device,
 			Status:    string(domain.LoginStatusFail),
-			Reason:    err.Msg(),
+			Reason:    errs.PasswordIncorrect.Msg(),
 		})
 
-		return "", err
+		return "", errs.PasswordIncorrect
 	}
 
-	defer repos.CreateLoginRecord(ctx, &po.LoginRecord{
+	_ = repos.CreateLoginRecord(ctx, &po.LoginRecord{
 		AccountID: account.AccountID,
 		LoginAt:   time.Now(),
 		IPv4:      req.IPv4,
