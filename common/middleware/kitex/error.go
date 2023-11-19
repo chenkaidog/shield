@@ -8,19 +8,43 @@ import (
 	"github.com/cloudwego/kitex/pkg/endpoint"
 )
 
-func ErrorHandlerMW(next endpoint.Endpoint) endpoint.Endpoint {
+func ServerErrorHandlerMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request, response interface{}) error {
 		if err := next(ctx, request, response); err != nil {
-			handleFailedResp(response, err)
+			handleServerFailedResp(response, err)
 			return nil
 		}
 
-		handleSuccessResp(response)
+		handleServerSuccessResp(response)
 		return nil
 	}
 }
 
-func handleFailedResp(result interface{}, err error) {
+func ClientErrorHandlerMW(next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request, response interface{}) error {
+		if err := next(ctx, request, response); err != nil {
+			// RPC发生异常，直接返回RPC error
+			return errs.RpcError.SetErr(err)
+		}
+
+		// rpc正常，检测是否有业务异常
+		if kRes, ok := response.(interface{ GetResult() interface{} }); ok {
+			baseRespField := reflect.ValueOf(kRes.GetResult()).Elem().FieldByName(baseFieldName)
+			if baseResp, ok := baseRespField.Interface().(interface {
+				GetCode() int32
+				GetMsg() string
+			}); ok {
+				if baseResp.GetCode() != errs.Success.Code() {
+					return errs.New(baseResp.GetCode(), baseResp.GetMsg())
+				}
+			}
+		}
+
+		return nil
+	}
+}
+
+func handleServerFailedResp(result interface{}, err error) {
 	if kRes, ok := result.(interface {
 		GetResult() interface{}
 		SetSuccess(x interface{})
@@ -31,7 +55,7 @@ func handleFailedResp(result interface{}, err error) {
 			kRes.SetSuccess(resp)
 		}
 
-		baseRespField := reflect.ValueOf(resp).Elem().FieldByName("Base")
+		baseRespField := reflect.ValueOf(resp).Elem().FieldByName(baseFieldName)
 		baseResp := reflect.New(baseRespField.Type().Elem())
 		baseRespField.Set(baseResp)
 		if baseInf, ok := baseResp.Interface().(interface {
@@ -51,7 +75,7 @@ func handleFailedResp(result interface{}, err error) {
 	}
 }
 
-func handleSuccessResp(result interface{}) {
+func handleServerSuccessResp(result interface{}) {
 	if kRes, ok := result.(interface {
 		GetResult() interface{}
 		SetSuccess(x interface{})
@@ -62,7 +86,7 @@ func handleSuccessResp(result interface{}) {
 			kRes.SetSuccess(resp)
 		}
 
-		baseRespField := reflect.ValueOf(resp).Elem().FieldByName("Base")
+		baseRespField := reflect.ValueOf(resp).Elem().FieldByName(baseFieldName)
 		baseResp := reflect.New(baseRespField.Type().Elem())
 		baseRespField.Set(baseResp)
 		if baseInf, ok := baseResp.Interface().(interface {

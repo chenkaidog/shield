@@ -5,7 +5,7 @@ import (
 	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
-	"shield/common/utils"
+	"shield/common/utils/gorm_utils"
 
 	"gorm.io/gorm"
 )
@@ -24,7 +24,7 @@ func NewLoginRecordDal(gormDB ...*gorm.DB) *loginRecordDal {
 
 func (dal *loginRecordDal) Insert(ctx context.Context, loginRecordPO ...*po.LoginRecord) errs.Error {
 	if err := dal.GetGormDB().WithContext(ctx).Create(loginRecordPO).Error; err != nil {
-		if utils.IsEntryDuplicateErr(err) {
+		if gorm_utils.IsEntryDuplicateErr(err) {
 			return errs.DbDuplicateError.SetErr(err)
 		}
 

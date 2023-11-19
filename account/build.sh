@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 RUN_NAME="kaidog.shield.account"
 
-mkdir -p output/bin
+mkdir -p output/bin output/conf
 cp script/* output/
+cp conf/* output/conf/
 chmod +x output/bootstrap.sh
 
 if [ "$IS_SYSTEM_TEST_ENV" != "1" ]; then

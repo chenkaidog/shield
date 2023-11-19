@@ -1,0 +1,2 @@
+gen_client:
+	kitex --thrift-plugin validator ../common/idl/account.thrift 

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"shield/account/internal/config"
-	gormlogger "shield/common/utils"
+	"shield/common/utils/gorm_utils"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -32,7 +32,7 @@ func Init() {
 		mysql.New(mysql.Config{Conn: sqlDB}),
 		&gorm.Config{
 			SkipDefaultTransaction: true,
-			Logger: &gormlogger.GormLogger{
+			Logger: &gorm_utils.GormLogger{
 				SlowThreshold: 2 * time.Second,
 				LogLevel:      logger.Info,
 			},
@@ -65,8 +65,8 @@ func (dal *defaultDal) SetGomDB(gormDB *gorm.DB) {
 
 func NewDefaultDal(gormDB ...*gorm.DB) Dal {
 	dal := &defaultDal{}
-	
-	if  len(gormDB) > 0 {
+
+	if len(gormDB) > 0 {
 		dal.SetGomDB(gormDB[0])
 	} else {
 		dal.SetGomDB(GetGormDB())

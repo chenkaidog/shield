@@ -25,7 +25,7 @@ CREATE TABLE `user`
 (
     `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增ID',
     `user_id`     VARCHAR(128)    NOT NULL COMMENT '用户唯一ID',
-    `account_id`  VARCHAR(128)    NOT NULL COMMENT 'unique account id'
+    `account_id`  VARCHAR(128)    NOT NULL COMMENT 'unique account id',
     `name`        VARCHAR(64)     NOT NULL COMMENT '用户名称',
     `gender`      VARCHAR(16)     NOT NULL COMMENT '',
     `phone`       VARCHAR(32)     NOT NULL COMMENT '用户手机号码',
