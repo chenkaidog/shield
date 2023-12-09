@@ -7,6 +7,7 @@ import (
 
 	"shield/common/logs"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
+	"shield/gateway/biz/model/resp"
 	"shield/gateway/biz/rpc"
 	"shield/gateway/biz/util"
 
@@ -40,7 +41,6 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-
 	util.BuildRespSuccess(c, utils.H{"account_id": rpcResp.AccountId})
 }
 
@@ -52,7 +52,8 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 	var req gateway.LogoutReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
@@ -68,13 +69,28 @@ func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
 	var req gateway.UserInfoQueryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, req.AccountID)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(c, &resp.UserInfoQueryResp{
+		AccountId:   rpcResp.AccountId,
+		UserId:      rpcResp.UserId,
+		Name:        rpcResp.Name,
+		Gender:      rpcResp.Gender,
+		Phone:       rpcResp.Phone,
+		Email:       rpcResp.Email,
+		Description: rpcResp.Description,
+		CreatedAt:   rpcResp.CreatedAt.Unix(),
+		UpdatedAt:   rpcResp.CreatedAt.Unix(),
+	})
 }
 
 // QueryLoginRecord .
@@ -84,13 +100,35 @@ func QueryLoginRecord(ctx context.Context, c *app.RequestContext) {
 	var req gateway.LoginRecordQueryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, req.AccountID)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	var recordList []*resp.LoginRecord
+	for _, record := range rpcResp.RecordList {
+		recordList = append(recordList, &resp.LoginRecord{
+			AccountId: record.AccountId,
+			Ipv4:      record.Ipv4,
+			Device:    record.Device,
+			Status:    record.Status,
+			Reason:    record.Reason,
+			LoginAt:   record.LoginAt.Unix(),
+		})
+	}
+
+	util.BuildRespSuccess(c, &resp.LoginRecordQueryResp{
+		Page:       rpcResp.Page,
+		Size:       rpcResp.Size,
+		Total:      rpcResp.Total,
+		RecordList: recordList,
+	})
 }
 
 // UpdatePassword .
@@ -100,11 +138,22 @@ func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 	var req gateway.PasswordUpdateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	bizErr := rpc.UpdatePassword(ctx, &rpc.UpdatePasswordReq{
+		AccountId: req.AccountID,
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
+	})
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
+
+	resp := resp.NewSuccessResp(nil)
 
 	c.JSON(consts.StatusOK, resp)
 }
