@@ -46,15 +46,36 @@ func (dal *accountDal) Update(ctx context.Context, accountPO *po.Account) errs.E
 	return nil
 }
 
-func (dal *accountDal) SelectByID(ctx context.Context, accountID string) (*po.Account, errs.Error) {
+func (dal *accountDal) Select(ctx context.Context, limit, offset int) ([]*po.Account, int64, errs.Error) {
+	var result []*po.Account
+	if err := dal.GetGormDB().WithContext(ctx).
+		Limit(limit).
+		Offset(offset).
+		Find(&result).Error; err != nil {
+		logs.CtxError(ctx, "select account by id err: %v", err)
+		return nil, 0, errs.DbError.SetErr(err)
+	}
+
+	var total int64
+	if err := dal.GetGormDB().WithContext(ctx).
+		Model(po.NewAccount()).
+		Count(&total).Error; err != nil {
+		logs.CtxError(ctx, "count account err: %v", err)
+		return nil, 0, errs.DbError.SetErr(err)
+	}
+
+	return result, total, nil
+}
+
+func (dal *accountDal) SelectByID(ctx context.Context, accontID string) (*po.Account, errs.Error) {
 	result := po.NewAccount()
 	if err := dal.GetGormDB().WithContext(ctx).
-		Where("account_id", accountID).
+		Where("account_id", accontID).
 		Take(result).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select account by id err: %v", err)
+		logs.CtxError(ctx, "select account by username err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 

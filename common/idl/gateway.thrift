@@ -35,7 +35,11 @@ struct LogoutReq {
     1: required string accountID (api.body="account_id");
 }
 
-struct UserInfo {
+struct UserInfoQueryReq {
+    1: required string accountID (api.query="account_id");
+}
+
+struct UserInfoQueryResp {
     1: string accountID (api.body="account_id");
     2: string username (api.body="username");
     3: AccountStatus status (api.body="status");
@@ -47,14 +51,6 @@ struct UserInfo {
     9: string description (api.body="description");
     10: i64 createdAt (api.body="created_at");
     11: i64 updatedAt (api.body="updated_at");
-}
-
-struct UserInfoQueryReq {
-    1: required string accountID (api.query="account_id");
-}
-
-struct UserInfoQueryResp {
-    1: UserInfo UserInfo (api.body="user_info");
 }
 
 struct LoginRecord {
@@ -72,6 +68,9 @@ struct LoginRecordQueryReq {
 
 struct LoginRecordQueryResp{
     1: list<LoginRecord> LoginRecord (api.body="login_record");
+    2: i64 total (api.body="total");
+    3: i64 page (api.body="page");
+    4: i64 size  (api.body="page");
 }
 
 struct PasswordUpdateReq {
@@ -83,9 +82,15 @@ struct PasswordUpdateReq {
 service UserService {
     BaseResp Login(1: LoginReq req) (api.post="/user/login");
     BaseResp Logout(1: LogoutReq req) (api.post="/user/logout");
-    BaseResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/user/user_info");
-    BaseResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/user/login_record");
-    BaseResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/userupdate_password");
+    BaseResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/user/query_user_info");
+    BaseResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/user/query_login_record");
+    BaseResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/user/update_password");
+}
+
+struct Account { 
+    1: required string accountID (api.body="account_id");
+    2: required string username (api.body="username");
+    3: required AccountStatus status (api.body="status");
 }
 
 struct AccountCreateReq {
@@ -95,6 +100,18 @@ struct AccountCreateReq {
 
 struct AccountCreateResp {
     1: string accountID (api.body="account_id");
+}
+
+struct AccountQueryReq {
+    1: required i64 page (api.query="page");
+    2: required i64 size (api.query="size");
+}
+
+struct AccountQueryResp {
+    1: list<Account> accountList (api.body="account_list");
+    2: i64 total (api.body="total");
+    3: i64 page (api.body="page");
+    4: i64 size  (api.body="page");
 }
 
 struct UserCreateReq {
@@ -131,6 +148,7 @@ struct AccountStatusSwitchReq {
 
 service AdminService {
     BaseResp CreateAccount(1: AccountCreateReq req) (api.post="/admin/create_account");
+    BaseResp QueryAccount(1: AccountQueryReq req) (api.get="/admin/query_account");
     BaseResp CreateUser(1: UserCreateReq req) (api.post="/admin/create_user");
     BaseResp UpdateUserInfo(1: UserInfoUpdateReq req) (api.post="/admin/update_user");
     BaseResp ResetPassword(1: PasswordRestReq req) (api.post="/admin/rest_password");

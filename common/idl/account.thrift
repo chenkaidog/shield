@@ -14,13 +14,17 @@ struct Account {
 }
 
 struct AccountQueryReq {
-    1: required string accountID (vt.pattern="^\\w{8,128}$")
-    
+    1: required i64 page (vt.ge = "1", vt.le = "999")
+    2: required i64 size (vt.ge = "1", vt.le = "999")
+
     255: required base.BaseReq base
 }
 
 struct AccountQueryResp {
-    1: optional Account account
+    1: optional list<Account> accountList
+    2: optional i64 total
+    3: optional i64 page
+    4: optional i64 size
 
     255: required base.BaseResp base
 }

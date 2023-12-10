@@ -59,7 +59,7 @@ type UserInfoQueryResp struct {
 	UpdatedAt   time.Time
 }
 
-var genderMapper = map[account.Gender]gateway.Gender{
+var gatewayGenderMapper = map[account.Gender]gateway.Gender{
 	account.Gender_male:   gateway.Gender_male,
 	account.Gender_female: gateway.Gender_female,
 	account.Gender_others: gateway.Gender_others,
@@ -116,7 +116,7 @@ func QueryUserInfoByAccountId(ctx context.Context, accountId string) (*UserInfoQ
 		AccountId:   resp.GetUser().GetAccountID(),
 		UserId:      resp.GetUser().GetUserID(),
 		Name:        resp.GetUser().GetName(),
-		Gender:      genderMapper[resp.GetUser().GetGender()],
+		Gender:      gatewayGenderMapper[resp.GetUser().GetGender()],
 		Phone:       resp.GetUser().GetPhone(),
 		Email:       resp.GetUser().GetEmail(),
 		Description: resp.GetUser().GetDescription(),
@@ -174,5 +174,180 @@ func UpdatePassword(ctx context.Context, req *UpdatePasswordReq) errs.Error {
 	}
 
 	return nil
+}
 
+type AccountCreateReq struct {
+	Username string
+	Password string
+}
+
+type AccountCreateResp struct {
+	AccountId string
+}
+
+func CreateAccount(ctx context.Context, req *AccountCreateReq) (*AccountCreateResp, errs.Error) {
+	resp, err := accountClient.CreateAccount(ctx,
+		&account.AccountCreateReq{
+			Username: req.Username,
+			Password: req.Password,
+		})
+	if err != nil {
+		return nil, buildRpcErr(err)
+	}
+
+	return &AccountCreateResp{
+		AccountId: resp.GetAccountID(),
+	}, nil
+}
+
+type UserCreateReq struct {
+	AccountId   string
+	Name        string
+	Gender      gateway.Gender
+	Phone       string
+	Email       string
+	Description string
+}
+
+var accountGenderMapper = map[gateway.Gender]account.Gender{
+	gateway.Gender_male:   account.Gender_male,
+	gateway.Gender_female: account.Gender_female,
+	gateway.Gender_others: account.Gender_others,
+}
+
+type UserCreateResp struct {
+	UserId string
+}
+
+func CreateUser(ctx context.Context, req *UserCreateReq) (*UserCreateResp, errs.Error) {
+	resp, err := accountClient.CreateUser(ctx,
+		&account.UserCreateReq{
+			AccountID:   req.AccountId,
+			Name:        req.Name,
+			Gender:      accountGenderMapper[req.Gender],
+			Phone:       req.Phone,
+			Email:       req.Email,
+			Description: req.Description,
+		})
+	if err != nil {
+		return nil, buildRpcErr(err)
+	}
+
+	return &UserCreateResp{
+		UserId: resp.GetUserID(),
+	}, nil
+}
+
+type UserInfoUpdateReq struct {
+	UserId      string
+	Name        string
+	Gender      gateway.Gender
+	Phone       string
+	Email       string
+	Description string
+}
+
+func UpdateUserInfo(ctx context.Context, req *UserInfoUpdateReq) errs.Error {
+	_, err := accountClient.UpdateUser(ctx,
+		&account.UserUpdateReq{
+			UserID:      req.UserId,
+			Name:        thrift.StringPtr(req.Description),
+			Gender:      (*account.Gender)(thrift.Int64Ptr(int64(accountGenderMapper[req.Gender]))),
+			Phone:       thrift.StringPtr(req.Phone),
+			Email:       thrift.StringPtr(req.Email),
+			Description: thrift.StringPtr(req.Description),
+		})
+	if err != nil {
+		return buildRpcErr(err)
+	}
+
+	return nil
+}
+
+type PasswordResetReq struct {
+	AccountId string
+	Password  string
+}
+
+func ResetPassword(ctx context.Context, req *PasswordResetReq) errs.Error {
+	_, err := accountClient.ResetAccountPassword(ctx,
+		&account.AccountPasswordResetReq{
+			AccountID: req.AccountId,
+			Password:  req.Password,
+		})
+	if err != nil {
+		return buildRpcErr(err)
+	}
+
+	return nil
+}
+
+type AccountStatusSwitchReq struct {
+	AccountId string
+	Status    gateway.AccountStatus
+}
+
+var accountStatusMapper = map[gateway.AccountStatus]account.AccountStatus{
+	gateway.AccountStatus_invalid: account.AccountStatus_invalid,
+	gateway.AccountStatus_valid:   account.AccountStatus_valid,
+}
+
+func SwitchAccountStatus(ctx context.Context, req *AccountStatusSwitchReq) errs.Error {
+	_, err := accountClient.UpdateAccountStatus(ctx,
+		&account.AccountStatusUpdateReq{
+			AccountID: req.AccountId,
+			Status:    accountStatusMapper[req.Status],
+		})
+	if err != nil {
+		return buildRpcErr(err)
+	}
+
+	return nil
+}
+
+type AccountQueryReq struct {
+	Page int64
+	Size int64
+}
+
+type Account struct {
+	AccountId string
+	Username  string
+	Status    gateway.AccountStatus
+}
+
+type AccountQueryResp struct {
+	Total       int64
+	AccountList []*Account
+}
+
+var gatewayAccountStatus = map[account.AccountStatus]gateway.AccountStatus{
+	account.AccountStatus_valid:   gateway.AccountStatus_valid,
+	account.AccountStatus_invalid: gateway.AccountStatus_invalid,
+}
+
+func QueryAccount(ctx context.Context, req *AccountQueryReq) (*AccountQueryResp, errs.Error) {
+	resp, err := accountClient.QueryAccount(ctx,
+		&account.AccountQueryReq{
+			Page: req.Page,
+			Size: req.Size,
+		})
+	if err != nil {
+		return nil, buildRpcErr(err)
+	}
+
+	var accountList []*Account
+	for _, result := range resp.GetAccountList() {
+		accountList = append(accountList,
+			&Account{
+				AccountId: result.GetAccountID(),
+				Username:  result.GetUsername(),
+				Status:    gatewayAccountStatus[result.GetStatus()],
+			})
+	}
+
+	return &AccountQueryResp{
+		Total:       resp.GetTotal(),
+		AccountList: accountList,
+	}, nil
 }

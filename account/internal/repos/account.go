@@ -15,8 +15,12 @@ func UpdateAccount(ctx context.Context,account *po.Account ) errs.Error {
 	return mysql.NewAccountDal().Update(ctx, account)
 }
 
-func SelectAccountByID(ctx context.Context, accountID string)(*po.Account, errs.Error)  {
-	return mysql.NewAccountDal().SelectByID(ctx, accountID)
+func SelectAccountByID(ctx context.Context, accountId string) (*po.Account, errs.Error) {
+	return mysql.NewAccountDal().SelectByID(ctx, accountId)
+}
+
+func SelectAccount(ctx context.Context,limit, offset int)([]*po.Account, int64, errs.Error)  {
+	return mysql.NewAccountDal().Select(ctx, limit, offset)
 }
 
 func SelectAccountByUsername(ctx context.Context, username string) (*po.Account, errs.Error) {

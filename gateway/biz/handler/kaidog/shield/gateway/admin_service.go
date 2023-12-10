@@ -5,9 +5,12 @@ package gateway
 import (
 	"context"
 
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"shield/common/logs"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
+	"shield/gateway/biz/rpc"
+	"shield/gateway/biz/util"
+
+	"github.com/cloudwego/hertz/pkg/app"
 )
 
 // CreateAccount .
@@ -17,13 +20,29 @@ func CreateAccount(ctx context.Context, c *app.RequestContext) {
 	var req gateway.AccountCreateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	rpcResp, bizErr := rpc.CreateAccount(
+		ctx,
+		&rpc.AccountCreateReq{
+			Username: req.GetUsername(),
+			Password: req.GetPassword(),
+		},
+	)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(
+		c,
+		&gateway.AccountCreateResp{
+			AccountID: rpcResp.AccountId,
+		},
+	)
 }
 
 // CreateUser .
@@ -33,13 +52,33 @@ func CreateUser(ctx context.Context, c *app.RequestContext) {
 	var req gateway.UserCreateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	rpcResp, bizErr := rpc.CreateUser(
+		ctx,
+		&rpc.UserCreateReq{
+			AccountId:   req.GetAccountID(),
+			Name:        req.GetName(),
+			Gender:      req.GetGender(),
+			Phone:       req.GetPhone(),
+			Email:       req.GetEmail(),
+			Description: req.GetDescription(),
+		},
+	)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(
+		c,
+		&gateway.UserCreateResp{
+			UserID: rpcResp.UserId,
+		},
+	)
 }
 
 // UpdateUserInfo .
@@ -49,13 +88,28 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	var req gateway.UserInfoUpdateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	bizErr := rpc.UpdateUserInfo(
+		ctx,
+		&rpc.UserInfoUpdateReq{
+			UserId:      req.GetUserID(),
+			Name:        req.GetName(),
+			Gender:      req.GetGender(),
+			Phone:       req.GetPhone(),
+			Email:       req.GetPhone(),
+			Description: req.GetDescription(),
+		},
+	)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(c, nil)
 }
 
 // ResetPassword .
@@ -65,13 +119,24 @@ func ResetPassword(ctx context.Context, c *app.RequestContext) {
 	var req gateway.PasswordRestReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	bizErr := rpc.ResetPassword(
+		ctx,
+		&rpc.PasswordResetReq{
+			AccountId: req.GetAccountID(),
+			Password:  req.GetNewPassword(),
+		},
+	)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(c, nil)
 }
 
 // SwitchAccountStatus .
@@ -81,11 +146,63 @@ func SwitchAccountStatus(ctx context.Context, c *app.RequestContext) {
 	var req gateway.AccountStatusSwitchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
 		return
 	}
 
-	resp := new(gateway.BaseResp)
+	bizErr := rpc.SwitchAccountStatus(
+		ctx,
+		&rpc.AccountStatusSwitchReq{
+			AccountId: req.GetAccountID(),
+			Status:    req.GetStatus(),
+		},
+	)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(c, nil)
+}
+
+// QueryAccount .
+// @router /admin/query_account [GET]
+func QueryAccount(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req gateway.AccountQueryReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
+		return
+	}
+
+	rpcResp, bizErr := rpc.QueryAccount(
+		ctx,
+		&rpc.AccountQueryReq{
+			Page: req.Page,
+			Size: req.Size,
+		},
+	)
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
+
+	var accountList []*gateway.Account
+	for _, accountResp := range rpcResp.AccountList {
+		accountList = append(
+			accountList,
+			&gateway.Account{
+				AccountID: accountResp.AccountId,
+				Username:  accountResp.Username,
+				Status:    accountResp.Status,
+			})
+	}
+
+	util.BuildRespSuccess(c, &gateway.AccountQueryResp{
+		Total:       rpcResp.Total,
+		AccountList: accountList,
+	})
 }

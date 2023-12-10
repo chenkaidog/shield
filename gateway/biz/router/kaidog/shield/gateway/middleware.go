@@ -70,3 +70,13 @@ func _userMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _queryaccountMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _queryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

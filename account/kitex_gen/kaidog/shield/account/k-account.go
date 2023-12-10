@@ -9,10 +9,8 @@ import (
 	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
-
-	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
-
 	"shield/account/kitex_gen/base"
+	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 
 // unused protection
@@ -23,7 +21,6 @@ var (
 	_ = reflect.Type(nil)
 	_ = thrift.TProtocol(nil)
 	_ = bthrift.BinaryWriter(nil)
-	_ = base.KitexUnusedProtection
 )
 
 func (p *Account) FastRead(buf []byte) (int, error) {
@@ -280,7 +277,8 @@ func (p *AccountQueryReq) FastRead(buf []byte) (int, error) {
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetAccountID bool = false
+	var issetPage bool = false
+	var issetSize bool = false
 	var issetBase bool = false
 	_, l, err = bthrift.Binary.ReadStructBegin(buf)
 	offset += l
@@ -299,13 +297,28 @@ func (p *AccountQueryReq) FastRead(buf []byte) (int, error) {
 		}
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetAccountID = true
+				issetPage = true
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSize = true
 			} else {
 				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -348,8 +361,13 @@ func (p *AccountQueryReq) FastRead(buf []byte) (int, error) {
 		goto ReadStructEndError
 	}
 
-	if !issetAccountID {
+	if !issetPage {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSize {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
@@ -377,12 +395,26 @@ RequiredFieldNotSetError:
 func (p *AccountQueryReq) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
 
-		p.AccountID = v
+		p.Page = v
+
+	}
+	return offset, nil
+}
+
+func (p *AccountQueryReq) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Size = v
 
 	}
 	return offset, nil
@@ -411,6 +443,7 @@ func (p *AccountQueryReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.Binar
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "AccountQueryReq")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField255(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
@@ -423,6 +456,7 @@ func (p *AccountQueryReq) BLength() int {
 	l += bthrift.Binary.StructBeginLength("AccountQueryReq")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
 		l += p.field255Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
@@ -432,8 +466,17 @@ func (p *AccountQueryReq) BLength() int {
 
 func (p *AccountQueryReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "accountID", thrift.STRING, 1)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.AccountID)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "page", thrift.I64, 1)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.Page)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *AccountQueryReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "size", thrift.I64, 2)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.Size)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -449,8 +492,17 @@ func (p *AccountQueryReq) fastWriteField255(buf []byte, binaryWriter bthrift.Bin
 
 func (p *AccountQueryReq) field1Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("accountID", thrift.STRING, 1)
-	l += bthrift.Binary.StringLengthNocopy(p.AccountID)
+	l += bthrift.Binary.FieldBeginLength("page", thrift.I64, 1)
+	l += bthrift.Binary.I64Length(p.Page)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *AccountQueryReq) field2Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("size", thrift.I64, 2)
+	l += bthrift.Binary.I64Length(p.Size)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -488,8 +540,50 @@ func (p *AccountQueryResp) FastRead(buf []byte) (int, error) {
 		}
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRUCT {
+			if fieldTypeId == thrift.LIST {
 				l, err = p.FastReadField1(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField4(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -560,13 +654,66 @@ RequiredFieldNotSetError:
 func (p *AccountQueryResp) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewAccount()
-	if l, err := tmp.FastRead(buf[offset:]); err != nil {
+	_, size, l, err := bthrift.Binary.ReadListBegin(buf[offset:])
+	offset += l
+	if err != nil {
+		return offset, err
+	}
+	p.AccountList = make([]*Account, 0, size)
+	for i := 0; i < size; i++ {
+		_elem := NewAccount()
+		if l, err := _elem.FastRead(buf[offset:]); err != nil {
+			return offset, err
+		} else {
+			offset += l
+		}
+
+		p.AccountList = append(p.AccountList, _elem)
+	}
+	if l, err := bthrift.Binary.ReadListEnd(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
 	}
-	p.Account = tmp
+	return offset, nil
+}
+
+func (p *AccountQueryResp) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		p.Total = &v
+
+	}
+	return offset, nil
+}
+
+func (p *AccountQueryResp) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		p.Page = &v
+
+	}
+	return offset, nil
+}
+
+func (p *AccountQueryResp) FastReadField4(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		p.Size = &v
+
+	}
 	return offset, nil
 }
 
@@ -592,6 +739,9 @@ func (p *AccountQueryResp) FastWriteNocopy(buf []byte, binaryWriter bthrift.Bina
 	offset := 0
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "AccountQueryResp")
 	if p != nil {
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
+		offset += p.fastWriteField4(buf[offset:], binaryWriter)
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField255(buf[offset:], binaryWriter)
 	}
@@ -605,6 +755,9 @@ func (p *AccountQueryResp) BLength() int {
 	l += bthrift.Binary.StructBeginLength("AccountQueryResp")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
+		l += p.field3Length()
+		l += p.field4Length()
 		l += p.field255Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
@@ -614,9 +767,50 @@ func (p *AccountQueryResp) BLength() int {
 
 func (p *AccountQueryResp) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	if p.IsSetAccount() {
-		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "account", thrift.STRUCT, 1)
-		offset += p.Account.FastWriteNocopy(buf[offset:], binaryWriter)
+	if p.IsSetAccountList() {
+		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "accountList", thrift.LIST, 1)
+		listBeginOffset := offset
+		offset += bthrift.Binary.ListBeginLength(thrift.STRUCT, 0)
+		var length int
+		for _, v := range p.AccountList {
+			length++
+			offset += v.FastWriteNocopy(buf[offset:], binaryWriter)
+		}
+		bthrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRUCT, length)
+		offset += bthrift.Binary.WriteListEnd(buf[offset:])
+		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	}
+	return offset
+}
+
+func (p *AccountQueryResp) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	if p.IsSetTotal() {
+		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "total", thrift.I64, 2)
+		offset += bthrift.Binary.WriteI64(buf[offset:], *p.Total)
+
+		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	}
+	return offset
+}
+
+func (p *AccountQueryResp) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	if p.IsSetPage() {
+		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "page", thrift.I64, 3)
+		offset += bthrift.Binary.WriteI64(buf[offset:], *p.Page)
+
+		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	}
+	return offset
+}
+
+func (p *AccountQueryResp) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	if p.IsSetSize() {
+		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "size", thrift.I64, 4)
+		offset += bthrift.Binary.WriteI64(buf[offset:], *p.Size)
+
 		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	}
 	return offset
@@ -632,9 +826,46 @@ func (p *AccountQueryResp) fastWriteField255(buf []byte, binaryWriter bthrift.Bi
 
 func (p *AccountQueryResp) field1Length() int {
 	l := 0
-	if p.IsSetAccount() {
-		l += bthrift.Binary.FieldBeginLength("account", thrift.STRUCT, 1)
-		l += p.Account.BLength()
+	if p.IsSetAccountList() {
+		l += bthrift.Binary.FieldBeginLength("accountList", thrift.LIST, 1)
+		l += bthrift.Binary.ListBeginLength(thrift.STRUCT, len(p.AccountList))
+		for _, v := range p.AccountList {
+			l += v.BLength()
+		}
+		l += bthrift.Binary.ListEndLength()
+		l += bthrift.Binary.FieldEndLength()
+	}
+	return l
+}
+
+func (p *AccountQueryResp) field2Length() int {
+	l := 0
+	if p.IsSetTotal() {
+		l += bthrift.Binary.FieldBeginLength("total", thrift.I64, 2)
+		l += bthrift.Binary.I64Length(*p.Total)
+
+		l += bthrift.Binary.FieldEndLength()
+	}
+	return l
+}
+
+func (p *AccountQueryResp) field3Length() int {
+	l := 0
+	if p.IsSetPage() {
+		l += bthrift.Binary.FieldBeginLength("page", thrift.I64, 3)
+		l += bthrift.Binary.I64Length(*p.Page)
+
+		l += bthrift.Binary.FieldEndLength()
+	}
+	return l
+}
+
+func (p *AccountQueryResp) field4Length() int {
+	l := 0
+	if p.IsSetSize() {
+		l += bthrift.Binary.FieldBeginLength("size", thrift.I64, 4)
+		l += bthrift.Binary.I64Length(*p.Size)
+
 		l += bthrift.Binary.FieldEndLength()
 	}
 	return l

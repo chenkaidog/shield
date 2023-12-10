@@ -8,7 +8,7 @@ import (
 	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
-	 "shield/common/utils/idgen"
+	"shield/common/utils/idgen"
 )
 
 func CreateAccount(ctx context.Context, req *domain.AccountCreateReq) (*domain.Account, errs.Error) {
@@ -87,18 +87,22 @@ func UpdateAccountStatus(ctx context.Context, req *domain.AccountStatusUpdateReq
 	})
 }
 
-func QueryAccount(ctx context.Context, req *domain.AccountQueryReq) (*domain.Account, errs.Error) {
-	account, err := repos.SelectAccountByID(ctx, req.AccountID)
+func QueryAccount(ctx context.Context, req *domain.AccountQueryReq) ([]*domain.Account, int64, errs.Error) {
+	limit, offset := req.Size, (req.Page-1)*req.Size
+	accountList, total, err := repos.SelectAccount(ctx, int(limit), int(offset))
 	if err != nil {
-		return nil, err
-	}
-	if account == nil {
-		return nil, nil
+		return nil, 0, err
 	}
 
-	return &domain.Account{
-		AccountID: account.AccountID,
-		Username:  account.Username,
-		Status:    domain.AccountStatus(account.Status),
-	}, nil
+	var result []*domain.Account
+	for _, account := range accountList {
+		result = append(result,
+			&domain.Account{
+				AccountID: account.AccountID,
+				Username:  account.Username,
+				Status:    domain.AccountStatus(account.Status),
+			})
+	}
+
+	return result, total, nil
 }

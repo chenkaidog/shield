@@ -6,18 +6,22 @@ import (
 	"shield/account/kitex_gen/kaidog/shield/account"
 	"shield/account/model/domain"
 	"shield/common/errs"
+
+	"github.com/apache/thrift/lib/go/thrift"
 )
 
 func QueryAccount(ctx context.Context, req *account.AccountQueryReq) (*account.AccountQueryResp, errs.Error) {
-	result, err := service.QueryAccount(ctx, &domain.AccountQueryReq{
-		AccountID: req.GetAccountID(),
+	resultList, total, err := service.QueryAccount(ctx, &domain.AccountQueryReq{
+		Page: req.GetPage(),
+		Size: req.GetSize(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	resp := account.NewAccountQueryResp()
-	if result != nil {
+	var accountList []*account.Account
+	for _, result := range resultList {
 		var status account.AccountStatus
 		switch result.Status {
 		case domain.AccountStatusValid:
@@ -25,12 +29,18 @@ func QueryAccount(ctx context.Context, req *account.AccountQueryReq) (*account.A
 		case domain.AccountStatusInvalid:
 			status = account.AccountStatus_invalid
 		}
-		resp.SetAccount(&account.Account{
-			AccountID: result.AccountID,
-			Username:  result.Username,
-			Status:    status,
-		})
+		accountList = append(accountList,
+			&account.Account{
+				AccountID: result.AccountID,
+				Username:  result.Username,
+				Status:    status,
+			})
 	}
+
+	resp.SetAccountList(accountList)
+	resp.SetTotal(thrift.Int64Ptr(total))
+	resp.SetPage(thrift.Int64Ptr(req.GetPage()))
+	resp.SetSize(thrift.Int64Ptr(req.GetSize()))
 
 	return resp, nil
 }

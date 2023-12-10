@@ -448,8 +448,9 @@ func (p *Account) Field3DeepEqual(src AccountStatus) bool {
 }
 
 type AccountQueryReq struct {
-	AccountID string        `thrift:"accountID,1,required" frugal:"1,required,string" json:"accountID"`
-	Base      *base.BaseReq `thrift:"base,255,required" frugal:"255,required,base.BaseReq" json:"base"`
+	Page int64         `thrift:"page,1,required" frugal:"1,required,i64" json:"page"`
+	Size int64         `thrift:"size,2,required" frugal:"2,required,i64" json:"size"`
+	Base *base.BaseReq `thrift:"base,255,required" frugal:"255,required,base.BaseReq" json:"base"`
 }
 
 func NewAccountQueryReq() *AccountQueryReq {
@@ -460,8 +461,12 @@ func (p *AccountQueryReq) InitDefault() {
 	*p = AccountQueryReq{}
 }
 
-func (p *AccountQueryReq) GetAccountID() (v string) {
-	return p.AccountID
+func (p *AccountQueryReq) GetPage() (v int64) {
+	return p.Page
+}
+
+func (p *AccountQueryReq) GetSize() (v int64) {
+	return p.Size
 }
 
 var AccountQueryReq_Base_DEFAULT *base.BaseReq
@@ -472,15 +477,19 @@ func (p *AccountQueryReq) GetBase() (v *base.BaseReq) {
 	}
 	return p.Base
 }
-func (p *AccountQueryReq) SetAccountID(val string) {
-	p.AccountID = val
+func (p *AccountQueryReq) SetPage(val int64) {
+	p.Page = val
+}
+func (p *AccountQueryReq) SetSize(val int64) {
+	p.Size = val
 }
 func (p *AccountQueryReq) SetBase(val *base.BaseReq) {
 	p.Base = val
 }
 
 var fieldIDToName_AccountQueryReq = map[int16]string{
-	1:   "accountID",
+	1:   "page",
+	2:   "size",
 	255: "base",
 }
 
@@ -492,7 +501,8 @@ func (p *AccountQueryReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetAccountID bool = false
+	var issetPage bool = false
+	var issetSize bool = false
 	var issetBase bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -510,11 +520,22 @@ func (p *AccountQueryReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetAccountID = true
+				issetPage = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetSize = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -545,8 +566,13 @@ func (p *AccountQueryReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetAccountID {
+	if !issetPage {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSize {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
@@ -573,10 +599,19 @@ RequiredFieldNotSetError:
 }
 
 func (p *AccountQueryReq) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.AccountID = v
+		p.Page = v
+	}
+	return nil
+}
+
+func (p *AccountQueryReq) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Size = v
 	}
 	return nil
 }
@@ -597,6 +632,10 @@ func (p *AccountQueryReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 		if err = p.writeField255(oprot); err != nil {
@@ -623,10 +662,10 @@ WriteStructEndError:
 }
 
 func (p *AccountQueryReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("accountID", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("page", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.AccountID); err != nil {
+	if err := oprot.WriteI64(p.Page); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -637,6 +676,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AccountQueryReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("size", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Size); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *AccountQueryReq) writeField255(oprot thrift.TProtocol) (err error) {
@@ -669,7 +725,10 @@ func (p *AccountQueryReq) DeepEqual(ano *AccountQueryReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.AccountID) {
+	if !p.Field1DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Size) {
 		return false
 	}
 	if !p.Field255DeepEqual(ano.Base) {
@@ -678,9 +737,16 @@ func (p *AccountQueryReq) DeepEqual(ano *AccountQueryReq) bool {
 	return true
 }
 
-func (p *AccountQueryReq) Field1DeepEqual(src string) bool {
+func (p *AccountQueryReq) Field1DeepEqual(src int64) bool {
 
-	if strings.Compare(p.AccountID, src) != 0 {
+	if p.Page != src {
+		return false
+	}
+	return true
+}
+func (p *AccountQueryReq) Field2DeepEqual(src int64) bool {
+
+	if p.Size != src {
 		return false
 	}
 	return true
@@ -694,8 +760,11 @@ func (p *AccountQueryReq) Field255DeepEqual(src *base.BaseReq) bool {
 }
 
 type AccountQueryResp struct {
-	Account *Account       `thrift:"account,1,optional" frugal:"1,optional,Account" json:"account,omitempty"`
-	Base    *base.BaseResp `thrift:"base,255,required" frugal:"255,required,base.BaseResp" json:"base"`
+	AccountList []*Account     `thrift:"accountList,1,optional" frugal:"1,optional,list<Account>" json:"accountList,omitempty"`
+	Total       *int64         `thrift:"total,2,optional" frugal:"2,optional,i64" json:"total,omitempty"`
+	Page        *int64         `thrift:"page,3,optional" frugal:"3,optional,i64" json:"page,omitempty"`
+	Size        *int64         `thrift:"size,4,optional" frugal:"4,optional,i64" json:"size,omitempty"`
+	Base        *base.BaseResp `thrift:"base,255,required" frugal:"255,required,base.BaseResp" json:"base"`
 }
 
 func NewAccountQueryResp() *AccountQueryResp {
@@ -706,13 +775,40 @@ func (p *AccountQueryResp) InitDefault() {
 	*p = AccountQueryResp{}
 }
 
-var AccountQueryResp_Account_DEFAULT *Account
+var AccountQueryResp_AccountList_DEFAULT []*Account
 
-func (p *AccountQueryResp) GetAccount() (v *Account) {
-	if !p.IsSetAccount() {
-		return AccountQueryResp_Account_DEFAULT
+func (p *AccountQueryResp) GetAccountList() (v []*Account) {
+	if !p.IsSetAccountList() {
+		return AccountQueryResp_AccountList_DEFAULT
 	}
-	return p.Account
+	return p.AccountList
+}
+
+var AccountQueryResp_Total_DEFAULT int64
+
+func (p *AccountQueryResp) GetTotal() (v int64) {
+	if !p.IsSetTotal() {
+		return AccountQueryResp_Total_DEFAULT
+	}
+	return *p.Total
+}
+
+var AccountQueryResp_Page_DEFAULT int64
+
+func (p *AccountQueryResp) GetPage() (v int64) {
+	if !p.IsSetPage() {
+		return AccountQueryResp_Page_DEFAULT
+	}
+	return *p.Page
+}
+
+var AccountQueryResp_Size_DEFAULT int64
+
+func (p *AccountQueryResp) GetSize() (v int64) {
+	if !p.IsSetSize() {
+		return AccountQueryResp_Size_DEFAULT
+	}
+	return *p.Size
 }
 
 var AccountQueryResp_Base_DEFAULT *base.BaseResp
@@ -723,20 +819,44 @@ func (p *AccountQueryResp) GetBase() (v *base.BaseResp) {
 	}
 	return p.Base
 }
-func (p *AccountQueryResp) SetAccount(val *Account) {
-	p.Account = val
+func (p *AccountQueryResp) SetAccountList(val []*Account) {
+	p.AccountList = val
+}
+func (p *AccountQueryResp) SetTotal(val *int64) {
+	p.Total = val
+}
+func (p *AccountQueryResp) SetPage(val *int64) {
+	p.Page = val
+}
+func (p *AccountQueryResp) SetSize(val *int64) {
+	p.Size = val
 }
 func (p *AccountQueryResp) SetBase(val *base.BaseResp) {
 	p.Base = val
 }
 
 var fieldIDToName_AccountQueryResp = map[int16]string{
-	1:   "account",
+	1:   "accountList",
+	2:   "total",
+	3:   "page",
+	4:   "size",
 	255: "base",
 }
 
-func (p *AccountQueryResp) IsSetAccount() bool {
-	return p.Account != nil
+func (p *AccountQueryResp) IsSetAccountList() bool {
+	return p.AccountList != nil
+}
+
+func (p *AccountQueryResp) IsSetTotal() bool {
+	return p.Total != nil
+}
+
+func (p *AccountQueryResp) IsSetPage() bool {
+	return p.Page != nil
+}
+
+func (p *AccountQueryResp) IsSetSize() bool {
+	return p.Size != nil
 }
 
 func (p *AccountQueryResp) IsSetBase() bool {
@@ -764,8 +884,38 @@ func (p *AccountQueryResp) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRUCT {
+			if fieldTypeId == thrift.LIST {
 				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -821,9 +971,48 @@ RequiredFieldNotSetError:
 }
 
 func (p *AccountQueryResp) ReadField1(iprot thrift.TProtocol) error {
-	p.Account = NewAccount()
-	if err := p.Account.Read(iprot); err != nil {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
 		return err
+	}
+	p.AccountList = make([]*Account, 0, size)
+	for i := 0; i < size; i++ {
+		_elem := NewAccount()
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		p.AccountList = append(p.AccountList, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AccountQueryResp) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Total = &v
+	}
+	return nil
+}
+
+func (p *AccountQueryResp) ReadField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Page = &v
+	}
+	return nil
+}
+
+func (p *AccountQueryResp) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Size = &v
 	}
 	return nil
 }
@@ -844,6 +1033,18 @@ func (p *AccountQueryResp) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 		if err = p.writeField255(oprot); err != nil {
@@ -870,11 +1071,19 @@ WriteStructEndError:
 }
 
 func (p *AccountQueryResp) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetAccount() {
-		if err = oprot.WriteFieldBegin("account", thrift.STRUCT, 1); err != nil {
+	if p.IsSetAccountList() {
+		if err = oprot.WriteFieldBegin("accountList", thrift.LIST, 1); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := p.Account.Write(oprot); err != nil {
+		if err := oprot.WriteListBegin(thrift.STRUCT, len(p.AccountList)); err != nil {
+			return err
+		}
+		for _, v := range p.AccountList {
+			if err := v.Write(oprot); err != nil {
+				return err
+			}
+		}
+		if err := oprot.WriteListEnd(); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -886,6 +1095,63 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AccountQueryResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if p.IsSetTotal() {
+		if err = oprot.WriteFieldBegin("total", thrift.I64, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI64(*p.Total); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *AccountQueryResp) writeField3(oprot thrift.TProtocol) (err error) {
+	if p.IsSetPage() {
+		if err = oprot.WriteFieldBegin("page", thrift.I64, 3); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI64(*p.Page); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *AccountQueryResp) writeField4(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSize() {
+		if err = oprot.WriteFieldBegin("size", thrift.I64, 4); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI64(*p.Size); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *AccountQueryResp) writeField255(oprot thrift.TProtocol) (err error) {
@@ -918,7 +1184,16 @@ func (p *AccountQueryResp) DeepEqual(ano *AccountQueryResp) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.Account) {
+	if !p.Field1DeepEqual(ano.AccountList) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Total) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Size) {
 		return false
 	}
 	if !p.Field255DeepEqual(ano.Base) {
@@ -927,9 +1202,51 @@ func (p *AccountQueryResp) DeepEqual(ano *AccountQueryResp) bool {
 	return true
 }
 
-func (p *AccountQueryResp) Field1DeepEqual(src *Account) bool {
+func (p *AccountQueryResp) Field1DeepEqual(src []*Account) bool {
 
-	if !p.Account.DeepEqual(src) {
+	if len(p.AccountList) != len(src) {
+		return false
+	}
+	for i, v := range p.AccountList {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+func (p *AccountQueryResp) Field2DeepEqual(src *int64) bool {
+
+	if p.Total == src {
+		return true
+	} else if p.Total == nil || src == nil {
+		return false
+	}
+	if *p.Total != *src {
+		return false
+	}
+	return true
+}
+func (p *AccountQueryResp) Field3DeepEqual(src *int64) bool {
+
+	if p.Page == src {
+		return true
+	} else if p.Page == nil || src == nil {
+		return false
+	}
+	if *p.Page != *src {
+		return false
+	}
+	return true
+}
+func (p *AccountQueryResp) Field4DeepEqual(src *int64) bool {
+
+	if p.Size == src {
+		return true
+	} else if p.Size == nil || src == nil {
+		return false
+	}
+	if *p.Size != *src {
 		return false
 	}
 	return true

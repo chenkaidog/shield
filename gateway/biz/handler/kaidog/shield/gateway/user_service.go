@@ -7,13 +7,10 @@ import (
 
 	"shield/common/logs"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
-	"shield/gateway/biz/model/resp"
 	"shield/gateway/biz/rpc"
 	"shield/gateway/biz/util"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Login .
@@ -29,19 +26,26 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	rpcResp, bizErr := rpc.Login(ctx,
+	rpcResp, bizErr := rpc.Login(
+		ctx,
 		&rpc.LoginReq{
-			Username: req.Username,
-			Password: req.Password,
-			Device:   "",
-			Ipv4:     "",
-		})
+			Username: req.GetUsername(),
+			Password: req.GetPassword(),
+			Device:   util.GetIp(c),
+			Ipv4:     util.GetDevice(c),
+		},
+	)
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
 	}
 
-	util.BuildRespSuccess(c, utils.H{"account_id": rpcResp.AccountId})
+	util.BuildRespSuccess(
+		c,
+		&gateway.LoginResp{
+			AccountID: rpcResp.AccountId,
+		},
+	)
 }
 
 // Logout .
@@ -57,9 +61,7 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(gateway.BaseResp)
-
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(c, nil)
 }
 
 // QueryUserInfo .
@@ -74,23 +76,26 @@ func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, req.AccountID)
+	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, req.GetAccountID())
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
 	}
 
-	util.BuildRespSuccess(c, &resp.UserInfoQueryResp{
-		AccountId:   rpcResp.AccountId,
-		UserId:      rpcResp.UserId,
-		Name:        rpcResp.Name,
-		Gender:      rpcResp.Gender,
-		Phone:       rpcResp.Phone,
-		Email:       rpcResp.Email,
-		Description: rpcResp.Description,
-		CreatedAt:   rpcResp.CreatedAt.Unix(),
-		UpdatedAt:   rpcResp.CreatedAt.Unix(),
-	})
+	util.BuildRespSuccess(
+		c,
+		&gateway.UserInfoQueryResp{
+			AccountID:   rpcResp.AccountId,
+			UserID:      rpcResp.UserId,
+			Name:        rpcResp.Name,
+			Gender:      rpcResp.Gender,
+			Phone:       rpcResp.Phone,
+			Email:       rpcResp.Email,
+			Description: rpcResp.Description,
+			CreatedAt:   rpcResp.CreatedAt.Unix(),
+			UpdatedAt:   rpcResp.CreatedAt.Unix(),
+		},
+	)
 }
 
 // QueryLoginRecord .
@@ -105,30 +110,36 @@ func QueryLoginRecord(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, req.AccountID)
+	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, req.GetAccountID())
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
 	}
 
-	var recordList []*resp.LoginRecord
+	var recordList []*gateway.LoginRecord
 	for _, record := range rpcResp.RecordList {
-		recordList = append(recordList, &resp.LoginRecord{
-			AccountId: record.AccountId,
-			Ipv4:      record.Ipv4,
-			Device:    record.Device,
-			Status:    record.Status,
-			Reason:    record.Reason,
-			LoginAt:   record.LoginAt.Unix(),
-		})
+		recordList = append(
+			recordList,
+			&gateway.LoginRecord{
+				AccountID: record.AccountId,
+				Ipv4:      record.Ipv4,
+				Device:    record.Device,
+				Status:    record.Status,
+				Reason:    record.Reason,
+				LoginAt:   record.LoginAt.Unix(),
+			},
+		)
 	}
 
-	util.BuildRespSuccess(c, &resp.LoginRecordQueryResp{
-		Page:       rpcResp.Page,
-		Size:       rpcResp.Size,
-		Total:      rpcResp.Total,
-		RecordList: recordList,
-	})
+	util.BuildRespSuccess(
+		c,
+		&gateway.LoginRecordQueryResp{
+			Page:        rpcResp.Page,
+			Size:        rpcResp.Size,
+			Total:       rpcResp.Total,
+			LoginRecord: recordList,
+		},
+	)
 }
 
 // UpdatePassword .
@@ -143,17 +154,18 @@ func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	bizErr := rpc.UpdatePassword(ctx, &rpc.UpdatePasswordReq{
-		AccountId: req.AccountID,
-		OldPassword: req.OldPassword,
-		NewPassword: req.NewPassword,
-	})
+	bizErr := rpc.UpdatePassword(
+		ctx,
+		&rpc.UpdatePasswordReq{
+			AccountId:   req.GetAccountID(),
+			OldPassword: req.GetOldPassword(),
+			NewPassword: req.GetNewPassword(),
+		},
+	)
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
 	}
 
-	resp := resp.NewSuccessResp(nil)
-
-	c.JSON(consts.StatusOK, resp)
+	util.BuildRespSuccess(c, nil)
 }
