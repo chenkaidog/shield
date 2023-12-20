@@ -1,4 +1,4 @@
-package hertz
+package middleware
 
 import (
 	"context"
@@ -20,7 +20,7 @@ const (
 	headerKeySpanId  = "X-Span-ID"
 )
 
-func ServerTraceMW() app.HandlerFunc {
+func TraceMiddleware() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		traceID := c.Request.Header.Get(headerKeyTraceId)
 		if traceID == "" {

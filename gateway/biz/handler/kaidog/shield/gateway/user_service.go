@@ -6,11 +6,14 @@ import (
 	"context"
 
 	"shield/common/logs"
+	"shield/gateway/biz/model/consts"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
 	"shield/gateway/biz/rpc"
 	"shield/gateway/biz/util"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/csrf"
+	"github.com/hertz-contrib/sessions"
 )
 
 // Login .
@@ -31,14 +34,19 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		&rpc.LoginReq{
 			Username: req.GetUsername(),
 			Password: req.GetPassword(),
-			Device:   util.GetIp(c),
-			Ipv4:     util.GetDevice(c),
+			Ipv4:     util.GetIp(c),
+			Device:   util.GetDevice(c),
 		},
 	)
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
 	}
+
+	sess := sessions.Default(c)
+	sess.Set(consts.SessionAccountId, rpcResp.AccountId)
+	_ = sess.Save()
+	c.Header(consts.CsrfHeaderName, csrf.GetToken(c))
 
 	util.BuildRespSuccess(
 		c,

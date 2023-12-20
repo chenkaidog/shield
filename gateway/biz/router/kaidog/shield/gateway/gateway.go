@@ -17,6 +17,8 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
+	root.POST("/login", append(_loginMw(), gateway.Login)...)
+	root.POST("/logout", append(_logoutMw(), gateway.Logout)...)
 	{
 		_admin := root.Group("/admin", _adminMw()...)
 		_admin.POST("/create_account", append(_createaccountMw(), gateway.CreateAccount)...)
@@ -28,8 +30,6 @@ func Register(r *server.Hertz) {
 	}
 	{
 		_user := root.Group("/user", _userMw()...)
-		_user.POST("/login", append(_loginMw(), gateway.Login)...)
-		_user.POST("/logout", append(_logoutMw(), gateway.Logout)...)
 		_user.GET("/query_login_record", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
 		_user.GET("/query_user_info", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
 		_user.POST("/update_password", append(_updatepasswordMw(), gateway.UpdatePassword)...)

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"shield/gateway/biz/middleware"
 	"shield/gateway/biz/rpc"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -12,6 +13,8 @@ func main() {
 	rpc.Init()
 
 	h := server.Default()
+
+	h.Use(middleware.Suite()...)
 
 	register(h)
 	h.Spin()

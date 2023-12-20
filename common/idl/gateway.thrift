@@ -70,7 +70,7 @@ struct LoginRecordQueryResp{
     1: list<LoginRecord> LoginRecord (api.body="login_record");
     2: i64 total (api.body="total");
     3: i64 page (api.body="page");
-    4: i64 size  (api.body="page");
+    4: i64 size  (api.body="size");
 }
 
 struct PasswordUpdateReq {
@@ -80,8 +80,8 @@ struct PasswordUpdateReq {
 }
 
 service UserService {
-    BaseResp Login(1: LoginReq req) (api.post="/user/login");
-    BaseResp Logout(1: LogoutReq req) (api.post="/user/logout");
+    BaseResp Login(1: LoginReq req) (api.post="/login");
+    BaseResp Logout(1: LogoutReq req) (api.post="/logout");
     BaseResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/user/query_user_info");
     BaseResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/user/query_login_record");
     BaseResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/user/update_password");
@@ -111,7 +111,7 @@ struct AccountQueryResp {
     1: list<Account> accountList (api.body="account_list");
     2: i64 total (api.body="total");
     3: i64 page (api.body="page");
-    4: i64 size  (api.body="page");
+    4: i64 size  (api.body="size");
 }
 
 struct UserCreateReq {

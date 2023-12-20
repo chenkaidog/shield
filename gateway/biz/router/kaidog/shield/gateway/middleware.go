@@ -3,6 +3,8 @@
 package gateway
 
 import (
+	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -22,8 +24,11 @@ func _createuserMw() []app.HandlerFunc {
 }
 
 func _loginMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		func(c context.Context, ctx *app.RequestContext) {
+			ctx.Next(c)
+		},
+	}
 }
 
 func _queryloginrecordMw() []app.HandlerFunc {
