@@ -85,3 +85,8 @@ func _queryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _operatorMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

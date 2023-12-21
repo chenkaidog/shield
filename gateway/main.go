@@ -4,6 +4,7 @@ package main
 
 import (
 	"shield/gateway/biz/middleware"
+	"shield/gateway/biz/repos"
 	"shield/gateway/biz/rpc"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -11,6 +12,7 @@ import (
 
 func main() {
 	rpc.Init()
+	repos.Init()
 
 	h := server.Default()
 
