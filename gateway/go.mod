@@ -17,6 +17,8 @@ require (
 	shield/common v0.0.0-00010101000000-000000000000
 )
 
+require gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
+
 require (
 	github.com/andeya/ameda v1.5.3 // indirect
 	github.com/andeya/goutil v1.0.1 // indirect
@@ -74,5 +76,5 @@ require (
 	google.golang.org/grpc v1.60.0 // indirect
 	google.golang.org/protobuf v1.31.1-0.20231027082548-f4a6c1f6e5c1 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1
 )

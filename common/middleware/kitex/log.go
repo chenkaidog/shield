@@ -3,7 +3,7 @@ package kitex
 import (
 	"context"
 	"shield/common/logs"
-	"shield/common/utils"
+	"shield/common/utils/sensitive"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/consts"
@@ -11,10 +11,10 @@ import (
 )
 
 func init() {
-	sensitiveMarshal = utils.NewSensitiveMarshal("password")
+	sensitiveMarshal = sensitive.NewSensitiveMarshal("password")
 }
 
-var sensitiveMarshal *utils.SensitiveMarshal
+var sensitiveMarshal *sensitive.SensitiveMarshal
 
 func SetSensitiveWord(words ...string) {
 	sensitiveMarshal.AddSensitiveWord(words...)

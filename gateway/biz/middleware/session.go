@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"shield/gateway/biz/config"
 	"shield/gateway/biz/repos"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,7 +26,13 @@ func SessionMiddleware() app.HandlerFunc {
 		panic(bizErr)
 	}
 
-	store, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte(secret))
+	store, err := redis.NewStore(
+		10,
+		"tcp",
+		fmt.Sprintf("%s:%d", config.GetRedisConf().IP, config.GetRedisConf().Port),
+		config.GetRedisConf().Password,
+		[]byte(secret),
+	)
 	if err != nil {
 		hlog.Error("init redis store fail: %v", err)
 		panic(err)

@@ -1,4 +1,4 @@
-package utils
+package sensitive
 
 import (
 	"reflect"

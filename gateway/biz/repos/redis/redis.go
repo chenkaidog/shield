@@ -2,7 +2,9 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"shield/common/errs"
+	"shield/gateway/biz/config"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -12,9 +14,9 @@ var rdbClient *redis.Client
 
 func InitReis() {
 	rdbClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     fmt.Sprintf("%s:%d", config.GetRedisConf().IP, config.GetRedisConf().Port),
+		Password: config.GetRedisConf().Password,
+		DB:       config.GetRedisConf().DB,
 	})
 
 	rdbClient.AddHook(new(loggerHook))
@@ -44,7 +46,7 @@ func Get(ctx context.Context, key string) (string, errs.Error) {
 			return "", nil
 		}
 
-		return errs.RedisError.SetErr(err)
+		return "", errs.RedisError.SetErr(err)
 	}
 
 	return result, nil

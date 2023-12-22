@@ -12,17 +12,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const defaultSkip = 2
+
 func init() {
 	defaultLogger = NewLogger()
 }
 
 var defaultLogger *Logger
 
-func getDefaultLogger() *Logger {
+func GetDefaultLogger() *Logger {
 	return defaultLogger
 }
 
 type Logger struct {
+	skip int
 	*logrus.Logger
 	currentPath string
 }
@@ -30,16 +33,17 @@ type Logger struct {
 func NewLogger() *Logger {
 	l := new(Logger)
 	l.Logger = logrus.New()
-	l.Logger.SetFormatter(&logrus.JSONFormatter{
-		TimestampFormat: time.RFC3339Nano,
-	})
+	l.Logger.SetFormatter(
+		&logrus.JSONFormatter{
+			TimestampFormat: time.RFC3339Nano,
+		})
 	absPath, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 	l.currentPath = absPath
-	l.setLevel(LevelInfo)
-	l.SetOutput(os.Stdout) // todo: 补充线上环境下的文件输出
+	l.setLevel(getLogLevel())
+	l.SetOutput(newOutput())
 
 	return l
 }
@@ -62,7 +66,7 @@ func (l *Logger) setLevel(level Level) {
 }
 
 func (l *Logger) withContext(ctx context.Context) *logrus.Entry {
-	entry := l.withLine(3)
+	entry := l.withLine()
 	trace, ok := ctx.Value(constant.Trace{}).(constant.Trace)
 	if ok {
 		return entry.WithFields(
@@ -76,8 +80,8 @@ func (l *Logger) withContext(ctx context.Context) *logrus.Entry {
 	return entry
 }
 
-func (l *Logger) withLine(skip int) *logrus.Entry {
-	_, file, line, ok := runtime.Caller(skip)
+func (l *Logger) withLine() *logrus.Entry {
+	_, file, line, ok := runtime.Caller(l.skip)
 	if ok {
 		return l.WithFields(logrus.Fields{
 			"location": fmt.Sprintf("%s:%d", path.Base(file), line),
@@ -99,53 +103,53 @@ const (
 )
 
 func SetLevel(level Level) {
-	getDefaultLogger().setLevel(level)
+	GetDefaultLogger().setLevel(level)
 }
 
 func Trace(format string, v ...interface{}) {
-	getDefaultLogger().withLine(2).Tracef(format, v...)
+	GetDefaultLogger().withLine(2).Tracef(format, v...)
 }
 
 func Debug(format string, v ...interface{}) {
-	getDefaultLogger().withLine(2).Debugf(format, v...)
+	GetDefaultLogger().withLine(2).Debugf(format, v...)
 }
 
 func Info(format string, v ...interface{}) {
-	getDefaultLogger().withLine(2).Infof(format, v...)
+	GetDefaultLogger().withLine(2).Infof(format, v...)
 }
 
 func Warn(format string, v ...interface{}) {
-	getDefaultLogger().withLine(2).Warnf(format, v...)
+	GetDefaultLogger().withLine(2).Warnf(format, v...)
 }
 
 func Error(format string, v ...interface{}) {
-	getDefaultLogger().withLine(2).Errorf(format, v...)
+	GetDefaultLogger().withLine(2).Errorf(format, v...)
 }
 
 func Fatal(format string, v ...interface{}) {
-	getDefaultLogger().withLine(2).Fatalf(format, v...)
+	GetDefaultLogger().withLine(2).Fatalf(format, v...)
 }
 
 func CtxTrace(ctx context.Context, format string, v ...interface{}) {
-	getDefaultLogger().withContext(ctx).Tracef(format, v...)
+	GetDefaultLogger().withContext(ctx).Tracef(format, v...)
 }
 
 func CtxDebug(ctx context.Context, format string, v ...interface{}) {
-	getDefaultLogger().withContext(ctx).Debugf(format, v...)
+	GetDefaultLogger().withContext(ctx).Debugf(format, v...)
 }
 
 func CtxInfo(ctx context.Context, format string, v ...interface{}) {
-	getDefaultLogger().withContext(ctx).Infof(format, v...)
+	GetDefaultLogger().withContext(ctx).Infof(format, v...)
 }
 
 func CtxWarn(ctx context.Context, format string, v ...interface{}) {
-	getDefaultLogger().withContext(ctx).Warnf(format, v...)
+	GetDefaultLogger().withContext(ctx).Warnf(format, v...)
 }
 
 func CtxError(ctx context.Context, format string, v ...interface{}) {
-	getDefaultLogger().withContext(ctx).Errorf(format, v...)
+	GetDefaultLogger().withContext(ctx).Errorf(format, v...)
 }
 
 func CtxFatal(ctx context.Context, format string, v ...interface{}) {
-	getDefaultLogger().withContext(ctx).Fatalf(format, v...)
+	GetDefaultLogger().withContext(ctx).Fatalf(format, v...)
 }

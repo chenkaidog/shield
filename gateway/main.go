@@ -3,6 +3,7 @@
 package main
 
 import (
+	"shield/gateway/biz/config"
 	"shield/gateway/biz/middleware"
 	"shield/gateway/biz/repos"
 	"shield/gateway/biz/rpc"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	config.Init()
 	rpc.Init()
 	repos.Init()
 

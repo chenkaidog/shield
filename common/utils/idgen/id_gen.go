@@ -3,7 +3,7 @@ package idgen
 import (
 	"fmt"
 	"os"
-	"shield/common/utils"
+	"shield/common/utils/ip"
 	"strconv"
 	"strings"
 	"time"
@@ -66,7 +66,7 @@ func newTraceIdPool(size int, stop chan interface{}) <-chan string {
 			default:
 				sb := strings.Builder{}
 				sb.WriteString(strconv.FormatUint(uint64(time.Now().UnixMilli()), 36))
-				sb.WriteString(utils.IPv4Hex())
+				sb.WriteString(ip.IPv4Hex())
 				sb.WriteString(strconv.FormatUint(fastrand.Uint64(), 36))
 				sb.WriteString(strconv.FormatInt(int64(os.Getpid()), 10))
 
@@ -110,7 +110,7 @@ func newLogIdPool(size int, stop chan interface{}) <-chan string {
 			default:
 				sb := strings.Builder{}
 				sb.WriteString(strconv.FormatUint(uint64(time.Now().UnixMilli()), 36))
-				sb.WriteString(utils.IPv4Hex())
+				sb.WriteString(ip.IPv4Hex())
 				sb.WriteString(strconv.FormatUint(fastrand.Uint64(), 36))
 				sb.WriteString(strconv.FormatUint(uint64(os.Getpid()), 10))
 
