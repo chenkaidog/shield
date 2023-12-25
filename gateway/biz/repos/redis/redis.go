@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"shield/common/errs"
+	hook "shield/common/middleware/redis"
 	"shield/gateway/biz/config"
 	"time"
 
@@ -19,7 +20,7 @@ func InitReis() {
 		DB:       config.GetRedisConf().DB,
 	})
 
-	rdbClient.AddHook(new(loggerHook))
+	rdbClient.AddHook(hook.NewRedisHook())
 }
 
 func SetNX(ctx context.Context, key, value string, timeout time.Duration) (bool, errs.Error) {

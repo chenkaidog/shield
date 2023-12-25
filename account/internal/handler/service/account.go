@@ -18,7 +18,7 @@ func CreateAccount(ctx context.Context, req *domain.AccountCreateReq) (*domain.A
 		return nil, err
 	}
 	if account != nil {
-		logs.CtxWarn(ctx, "username already exists")
+		logs.CtxWarnf(ctx, "username already exists")
 		return nil, errs.UsernameDuplidateError
 	}
 
@@ -53,7 +53,7 @@ func UpdateAccountPassword(ctx context.Context, req *domain.AccountPswUpdateReq)
 		return err
 	}
 	if account == nil {
-		logs.CtxWarn(ctx, "account not exist")
+		logs.CtxWarnf(ctx, "account not exist")
 		return errs.AccountNotExistError
 	}
 

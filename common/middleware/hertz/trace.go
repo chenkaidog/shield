@@ -2,7 +2,7 @@ package hertz
 
 import (
 	"context"
-	"shield/common/constant"
+	"shield/common/trace"
 	"shield/common/utils/idgen"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -34,7 +34,8 @@ func ServerTraceMW() app.HandlerFunc {
 
 		pspanID := c.Request.Header.Get(headerKeySpanId)
 		spanID := idGen.NewSpanID(pspanID)
-		ctx = context.WithValue(ctx, constant.Trace{}, constant.Trace{
+
+		ctx = trace.ContextWithTrace(ctx, trace.Trace{
 			LogID:   logID,
 			TraceID: traceID,
 			SpanID:  spanID,

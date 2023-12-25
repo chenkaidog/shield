@@ -18,21 +18,17 @@ const (
 	logFileMaxAge   = 14
 	defaultLogLevel = LevelInfo
 
-	envLogOutputFileName      = "log_output_file_name"
-	envLogsSetOutputLocalFile = "logs_set_output_local_file"
+	envLogOutputFileName      = "logs_output_file_name"
+	envLogsSetOutputLocalFile = "logs_set_local_file"
 	envLogsLevel              = "logs_level"
 )
 
 func newOutput() io.Writer {
 	if os.Getenv(envLogsSetOutputLocalFile) == "true" {
-		filename := "kaidog"
-		if outputName := os.Getenv(envLogOutputFileName); outputName != "" {
-			filename = fmt.Sprintf(logFileName, outputName)
-		}
 		return io.MultiWriter(
 			os.Stdout,
 			&lumberjack.Logger{
-				Filename:   filename,
+				Filename:   fmt.Sprintf(logFileName, os.Getenv(envLogOutputFileName)),
 				MaxSize:    logFileMaxSize,
 				MaxAge:     logFileMaxAge,
 				MaxBackups: logFileMaxBackups,

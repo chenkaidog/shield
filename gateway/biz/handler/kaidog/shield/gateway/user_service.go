@@ -24,7 +24,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req gateway.LoginReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -64,7 +64,7 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 	var req gateway.LogoutReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -79,7 +79,7 @@ func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
 	var req gateway.UserInfoQueryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -113,7 +113,7 @@ func QueryLoginRecord(ctx context.Context, c *app.RequestContext) {
 	var req gateway.LoginRecordQueryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -157,7 +157,7 @@ func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 	var req gateway.PasswordUpdateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}

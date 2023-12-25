@@ -26,7 +26,7 @@ func (dal *accountDal) Insert(ctx context.Context, accountPO ...*po.Account) err
 			return errs.DbDuplicateError.SetErr(err)
 		}
 
-		logs.CtxError(ctx, "insert account err: %v", err)
+		logs.CtxErrorf(ctx, "insert account err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
@@ -39,7 +39,7 @@ func (dal *accountDal) Update(ctx context.Context, accountPO *po.Account) errs.E
 		Where("account_id", accountPO.AccountID).
 		Updates(accountPO).Error
 	if err != nil {
-		logs.CtxError(ctx, "update account err: %v", err)
+		logs.CtxErrorf(ctx, "update account err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
@@ -52,7 +52,7 @@ func (dal *accountDal) Select(ctx context.Context, limit, offset int) ([]*po.Acc
 		Limit(limit).
 		Offset(offset).
 		Find(&result).Error; err != nil {
-		logs.CtxError(ctx, "select account by id err: %v", err)
+		logs.CtxErrorf(ctx, "select account by id err: %v", err)
 		return nil, 0, errs.DbError.SetErr(err)
 	}
 
@@ -60,7 +60,7 @@ func (dal *accountDal) Select(ctx context.Context, limit, offset int) ([]*po.Acc
 	if err := dal.GetGormDB().WithContext(ctx).
 		Model(po.NewAccount()).
 		Count(&total).Error; err != nil {
-		logs.CtxError(ctx, "count account err: %v", err)
+		logs.CtxErrorf(ctx, "count account err: %v", err)
 		return nil, 0, errs.DbError.SetErr(err)
 	}
 
@@ -75,7 +75,7 @@ func (dal *accountDal) SelectByID(ctx context.Context, accontID string) (*po.Acc
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select account by username err: %v", err)
+		logs.CtxErrorf(ctx, "select account by username err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 
@@ -90,7 +90,7 @@ func (dal *accountDal) SelectByUsername(ctx context.Context, username string) (*
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select account by username err: %v", err)
+		logs.CtxErrorf(ctx, "select account by username err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 

@@ -16,7 +16,7 @@ func GetRandomSecret(ctx context.Context, key, secret string) (string, errs.Erro
 		return "", err
 	}
 	if ok {
-		return secret, nil 
+		return secret, nil
 	}
 
 	existedSecret, err := redis.Get(ctx, key)

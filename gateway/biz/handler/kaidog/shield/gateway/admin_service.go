@@ -20,7 +20,7 @@ func CreateAccount(ctx context.Context, c *app.RequestContext) {
 	var req gateway.AccountCreateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -52,7 +52,7 @@ func CreateUser(ctx context.Context, c *app.RequestContext) {
 	var req gateway.UserCreateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -88,7 +88,7 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	var req gateway.UserInfoUpdateReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -119,7 +119,7 @@ func ResetPassword(ctx context.Context, c *app.RequestContext) {
 	var req gateway.PasswordRestReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -146,7 +146,7 @@ func SwitchAccountStatus(ctx context.Context, c *app.RequestContext) {
 	var req gateway.AccountStatusSwitchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}
@@ -173,7 +173,7 @@ func QueryAccount(ctx context.Context, c *app.RequestContext) {
 	var req gateway.AccountQueryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logs.CtxError(ctx, "BindAndValidate fail, %v", err)
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
 	}

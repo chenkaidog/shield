@@ -20,6 +20,6 @@ func GetIp(c *app.RequestContext) string {
 
 func GetDevice(c *app.RequestContext) string {
 	userAgent := user_agent.New(string(c.UserAgent()))
-	name, version :=  userAgent.Browser()
+	name, version := userAgent.Browser()
 	return fmt.Sprintf("%s/%s", name, version)
 }

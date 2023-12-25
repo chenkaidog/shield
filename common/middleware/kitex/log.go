@@ -37,9 +37,9 @@ func KitexLogMW(next endpoint.Endpoint) endpoint.Endpoint {
 			respBody = respArg.GetResult()
 		}
 
-		logs.CtxInfo(ctx, "[%s] request body: %v", methodName, sensitiveMarshal.SafeMarshal(reqBody))
+		logs.CtxInfof(ctx, "[%s] request body: %v", methodName, sensitiveMarshal.SafeMarshal(reqBody))
 		defer func() {
-			logs.CtxInfo(ctx, "[%s] resp body: %v, cost: %dms",
+			logs.CtxInfof(ctx, "[%s] resp body: %v, cost: %dms",
 				methodName, sensitiveMarshal.SafeMarshal(respBody), time.Since(startTime)/time.Millisecond)
 		}()
 		if err := next(ctx, request, response); err != nil {

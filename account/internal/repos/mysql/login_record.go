@@ -28,7 +28,7 @@ func (dal *loginRecordDal) Insert(ctx context.Context, loginRecordPO ...*po.Logi
 			return errs.DbDuplicateError.SetErr(err)
 		}
 
-		logs.CtxError(ctx, "insert user err: %v", err)
+		logs.CtxErrorf(ctx, "insert user err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
@@ -43,7 +43,7 @@ func (dal *loginRecordDal) Select(ctx context.Context, accountID string, limit, 
 		Limit(limit).
 		Offset(offset).
 		Find(&result).Error; err != nil {
-		logs.CtxError(ctx, "select login record err: %v", err)
+		logs.CtxErrorf(ctx, "select login record err: %v", err)
 		return nil, 0, errs.DbError.SetErr(err)
 	}
 
@@ -52,7 +52,7 @@ func (dal *loginRecordDal) Select(ctx context.Context, accountID string, limit, 
 		Model(po.NewLoginRecord()).
 		Where("account_id", accountID).
 		Count(&total).Error; err != nil {
-		logs.CtxError(ctx, "count login record err: %v", err)
+		logs.CtxErrorf(ctx, "count login record err: %v", err)
 		return nil, 0, errs.DbError.SetErr(err)
 	}
 

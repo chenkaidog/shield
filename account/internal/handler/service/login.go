@@ -18,7 +18,7 @@ func Login(ctx context.Context, req *domain.LoginReq) (string, errs.Error) {
 		return "", err
 	}
 	if account == nil {
-		logs.CtxWarn(ctx, "account not exist")
+		logs.CtxWarnf(ctx, "account not exist")
 		return "", errs.AccountNotExistError
 	}
 

@@ -3,7 +3,7 @@ package kitex
 import (
 	"context"
 	"reflect"
-	"shield/common/constant"
+	"shield/common/trace"
 	"shield/common/utils/idgen"
 
 	"github.com/cloudwego/kitex/pkg/endpoint"
@@ -22,7 +22,6 @@ type serverBaseReq interface {
 	GetTraceID() string
 	GetSpanID() string
 }
-
 
 type clientBaseReq interface {
 	SetLogID(string)
@@ -48,7 +47,7 @@ func ServerTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 			traceID = idGen.NewTraceID()
 		}
 
-		ctx = context.WithValue(ctx, constant.Trace{}, constant.Trace{
+		ctx = trace.ContextWithTrace(ctx, trace.Trace{
 			LogID:   logID,
 			TraceID: traceID,
 			SpanID:  idGen.NewSpanID(spanID),
@@ -59,14 +58,14 @@ func ServerTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 }
 
 func ClientTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
-	return func(ctx context.Context, args, result  interface{}) (err error) {
-		trace, ok := ctx.Value(constant.Trace{}).(constant.Trace)
+	return func(ctx context.Context, args, result interface{}) (err error) {
+		tr, ok := trace.TraceFromContext(ctx)
 		if ok {
 			if gfa, ok := args.(interface{ GetFirstArgument() interface{} }); ok {
 				if baseReq := getClientBaseReq(gfa.GetFirstArgument()); baseReq != nil {
-					baseReq.SetLogID(trace.LogID)
-					baseReq.SetTraceID(trace.TraceID)
-					baseReq.SetSpanID(trace.SpanID)
+					baseReq.SetLogID(tr.LogID)
+					baseReq.SetTraceID(tr.TraceID)
+					baseReq.SetSpanID(tr.SpanID)
 				}
 			}
 		}

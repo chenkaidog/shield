@@ -19,7 +19,7 @@ func NewSensitiveMarshal(words ...string) *SensitiveMarshal {
 	}
 }
 
-func (sm *SensitiveMarshal) AddSensitiveWord(words...string) {
+func (sm *SensitiveMarshal) AddSensitiveWord(words ...string) {
 	for _, word := range words {
 		sm.sensitiveSet[word] = true
 	}
@@ -79,4 +79,3 @@ func (sm *SensitiveMarshal) sensitiveMarshal(obj interface{}) interface{} {
 	// 否则直接返回
 	return objValue.Interface()
 }
-

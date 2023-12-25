@@ -13,6 +13,10 @@ import (
 type loggerHook struct {
 }
 
+func NewRedisHook() redis.Hook {
+	return new(loggerHook)
+}
+
 func (*loggerHook) DialHook(next redis.DialHook) redis.DialHook {
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return next(ctx, network, addr)
@@ -28,9 +32,9 @@ func (*loggerHook) ProcessHook(next redis.ProcessHook) redis.ProcessHook {
 		costTime := float64(time.Since(startTime).Microseconds()) / 1000
 
 		if err != nil && err != redis.Nil {
-			logs.CtxError(ctx, "go-redis command fail: %s, err: %s, cost: %.3f", cmd.String(), err.Error(), costTime)
+			logs.CtxErrorf(ctx, "go-redis command fail: %s, err: %s, cost: %.3f", cmd.String(), err.Error(), costTime)
 		} else {
-			logs.CtxInfo(ctx, "redis command: %s, cost: %.3f", cmd.String(), costTime)
+			logs.CtxInfof(ctx, "redis command: %s, cost: %.3f", cmd.String(), costTime)
 		}
 
 		return err
@@ -50,10 +54,10 @@ func (*loggerHook) ProcessPipelineHook(next redis.ProcessPipelineHook) redis.Pro
 			cmdAggregation = append(cmdAggregation, cmd.String())
 		}
 
-		if err != nil && err != redis.Nil{
-			logs.CtxError(ctx, "pipeline fail: \n%s\n, err: %s, cost: %.3f", strings.Join(cmdAggregation, "\n"), err.Error(), costTime)
+		if err != nil && err != redis.Nil {
+			logs.CtxErrorf(ctx, "pipeline fail: \n%s\n, err: %s, cost: %.3f", strings.Join(cmdAggregation, "\n"), err.Error(), costTime)
 		} else {
-			logs.CtxInfo(ctx, "pipeline success: \n%s\n, cost: %.3f", strings.Join(cmdAggregation, "\n"), costTime)
+			logs.CtxInfof(ctx, "pipeline success: \n%s\n, cost: %.3f", strings.Join(cmdAggregation, "\n"), costTime)
 		}
 
 		return err

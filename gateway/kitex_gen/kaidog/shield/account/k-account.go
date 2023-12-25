@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
-	"shield/gateway/kitex_gen/base"
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
+	"shield/gateway/kitex_gen/base"
 )
 
 // unused protection
