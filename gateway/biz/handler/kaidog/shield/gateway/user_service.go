@@ -5,9 +5,11 @@ package gateway
 import (
 	"context"
 
+	"shield/common/errs"
 	"shield/common/logs"
 	"shield/gateway/biz/model/consts"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
+	"shield/gateway/biz/repos"
 	"shield/gateway/biz/rpc"
 	"shield/gateway/biz/util"
 
@@ -45,8 +47,18 @@ func Login(ctx context.Context, c *app.RequestContext) {
 
 	sess := sessions.Default(c)
 	sess.Set(consts.SessionAccountId, rpcResp.AccountId)
-	_ = sess.Save()
+	if err = sess.Save(); err != nil {
+		logs.CtxErrorf(ctx, "save session err: %v", err)
+		util.BuildRespBizErr(c, errs.ServerError)
+		return
+	}
+
 	c.Header(consts.CsrfHeaderName, csrf.GetToken(c))
+
+	if bizErr = repos.SetAccountSessionID(ctx, rpcResp.AccountId, sess.ID()); bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
 
 	util.BuildRespSuccess(
 		c,
@@ -67,6 +79,25 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
 		util.BuildRespParamErr(c, err)
 		return
+	}
+
+	sess := sessions.Default(c)
+	accountId, ok := sess.Get(consts.SessionAccountId).(string)
+	if ok {
+		sessID, bizErr := repos.GetAccountSessionID(ctx, accountId)
+		if bizErr != nil {
+			util.BuildRespBizErr(c, bizErr)
+			return
+		}
+		if sess.ID() == sessID {
+			if bizErr = repos.RemoveAccountSessionID(ctx, accountId); bizErr != nil {
+				util.BuildRespBizErr(c, bizErr)
+				return
+			}
+		}
+
+		sess.Clear()
+		_ = sess.Save()
 	}
 
 	util.BuildRespSuccess(c, nil)

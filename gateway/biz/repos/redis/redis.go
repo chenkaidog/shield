@@ -52,3 +52,11 @@ func Get(ctx context.Context, key string) (string, errs.Error) {
 
 	return result, nil
 }
+
+func Del(ctx context.Context, keys ...string) errs.Error {
+	if _, err := rdbClient.Del(ctx, keys...).Result(); err != nil {
+		return errs.RedisError.SetErr(err)
+	}
+
+	return nil
+}

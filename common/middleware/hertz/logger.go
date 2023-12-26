@@ -12,7 +12,7 @@ type hertzLogger struct {
 	logger logs.Logger
 }
 
-func NewHertzLogger() hlog.Logger {
+func NewHertzLogger() hlog.FullLogger {
 	return &hertzLogger{
 		logger: logs.GetDefaultLogger(),
 	}

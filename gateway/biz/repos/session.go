@@ -2,12 +2,25 @@ package repos
 
 import (
 	"context"
+	"fmt"
 	"shield/common/errs"
 	"shield/gateway/biz/repos/redis"
 )
 
-func SetAccountCsrfToken(ctx context.Context) {
+func genAccountSessionIDKey(accountId string) string {
+	return fmt.Sprintf("session_id_%s", accountId)
+}
 
+func SetAccountSessionID(ctx context.Context, accountId, token string) errs.Error {
+	return redis.Set(ctx, genAccountSessionIDKey(accountId), token, 0)
+}
+
+func GetAccountSessionID(ctx context.Context, accountId string) (string, errs.Error) {
+	return redis.Get(ctx, genAccountSessionIDKey(accountId))
+}
+
+func RemoveAccountSessionID(ctx context.Context, accountId string) errs.Error {
+	return redis.Del(ctx, genAccountSessionIDKey(accountId))
 }
 
 func GetRandomSecret(ctx context.Context, key, secret string) (string, errs.Error) {

@@ -3,12 +3,52 @@
 package main
 
 import (
+	"context"
+	"shield/common/logs"
 	handler "shield/gateway/biz/handler"
+	"time"
 
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/hertz-contrib/sessions"
 )
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
+
+	r.GET("/sess_login", func(ctx context.Context, c *app.RequestContext) {
+		sess := sessions.Default(c)
+		sess.Set("login_at", time.Now().Unix())
+
+		if err := sess.Save(); err != nil {
+			c.JSON(500, err.Error())
+			return
+		}
+
+		logs.CtxInfof(ctx, "login success: %v", sess.ID())
+		c.JSON(200, "login success")
+	})
+
+	r.GET("/sess_query", func(ctx context.Context, c *app.RequestContext) {
+		sess := sessions.Default(c)
+		loginAt, ok := sess.Get("login_at").(int64)
+		if ok {
+			c.JSON(200, loginAt)
+			return
+		}
+
+		c.JSON(200, "record not found")
+	})
+
+	r.GET("/sess_logout", func(ctx context.Context, c *app.RequestContext) {
+		sess := sessions.Default(c)
+		sess.Clear()
+		if err := sess.Save(); err != nil {
+			c.JSON(500, err.Error())
+			return
+		}
+
+		c.JSON(200, "success")
+	})
 }

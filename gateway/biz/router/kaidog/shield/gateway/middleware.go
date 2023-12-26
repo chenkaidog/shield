@@ -4,8 +4,12 @@ package gateway
 
 import (
 	"context"
+	"net/http"
+	"shield/gateway/biz/model/consts"
+	"shield/gateway/biz/repos"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/sessions"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -24,11 +28,7 @@ func _createuserMw() []app.HandlerFunc {
 }
 
 func _loginMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		func(c context.Context, ctx *app.RequestContext) {
-			ctx.Next(c)
-		},
-	}
+	return nil
 }
 
 func _queryloginrecordMw() []app.HandlerFunc {
@@ -81,12 +81,28 @@ func _queryaccountMw() []app.HandlerFunc {
 	return nil
 }
 
-func _queryMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _operatorMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		func(ctx context.Context, c *app.RequestContext) {
+			sess := sessions.Default(c)
+			accountId, ok := sess.Get(consts.SessionAccountId).(string)
+			if !ok {
+				c.AbortWithMsg("user not login", http.StatusUnauthorized)
+				// todo: redirect
+				return
+			}
+			sessID, bizErr := repos.GetAccountSessionID(ctx, accountId)
+			if bizErr != nil {
+				c.AbortWithMsg("server error", http.StatusInternalServerError)
+				return
+			}
+			if sessID != sess.ID() {
+				c.AbortWithMsg("login timeout", http.StatusUnauthorized)
+				// todo: redirect
+				return
+			}
+
+			c.Next(ctx)
+		},
+	}
 }
