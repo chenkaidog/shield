@@ -3,7 +3,7 @@ package errs
 import "fmt"
 
 type Error interface {
-	error
+	Error() string
 	Code() int32
 	Msg() string
 	SetErr(err error) Error
@@ -64,8 +64,9 @@ var (
 	DbError             = New(1_0003, "db error")
 	RecordNotFoundError = New(1_0004, "record not found error")
 	DbDuplicateError    = New(1_0005, "db key duplicate error")
-	RpcError            = New(1_000_6, "rpc error")
-	RemoteHttpError     = New(1_000_7, "remote http error")
+	RpcError            = New(1_0006, "rpc error")
+	RemoteHttpError     = New(1_0007, "remote http error")
+	RedisError          = New(1_0008, "redis error")
 
 	UsernameDuplidateError = New(2_0001, "username already exists")
 	AccountNotExistError   = New(2_0002, "account not exist")

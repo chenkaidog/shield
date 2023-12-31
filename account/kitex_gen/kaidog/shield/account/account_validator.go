@@ -25,9 +25,17 @@ func (p *Account) IsValid() error {
 	return nil
 }
 func (p *AccountQueryReq) IsValid() error {
-	_src := "^\\w{8,128}$"
-	if ok, _ := regexp.MatchString(_src, p.AccountID); !ok {
-		return fmt.Errorf("field AccountID pattern rule failed, current value: %v", p.AccountID)
+	if p.Page < int64(1) {
+		return fmt.Errorf("field Page ge rule failed, current value: %v", p.Page)
+	}
+	if p.Page > int64(999) {
+		return fmt.Errorf("field Page le rule failed, current value: %v", p.Page)
+	}
+	if p.Size < int64(1) {
+		return fmt.Errorf("field Size ge rule failed, current value: %v", p.Size)
+	}
+	if p.Size > int64(999) {
+		return fmt.Errorf("field Size le rule failed, current value: %v", p.Size)
 	}
 	if p.Base != nil {
 		if err := p.Base.IsValid(); err != nil {
@@ -37,11 +45,6 @@ func (p *AccountQueryReq) IsValid() error {
 	return nil
 }
 func (p *AccountQueryResp) IsValid() error {
-	if p.Account != nil {
-		if err := p.Account.IsValid(); err != nil {
-			return fmt.Errorf("field Account not valid, %w", err)
-		}
-	}
 	if p.Base != nil {
 		if err := p.Base.IsValid(); err != nil {
 			return fmt.Errorf("field Base not valid, %w", err)
@@ -231,13 +234,13 @@ func (p *UserCreateReq) IsValid() error {
 	if ok, _ := regexp.MatchString(_src, p.AccountID); !ok {
 		return fmt.Errorf("field AccountID pattern rule failed, current value: %v", p.AccountID)
 	}
-	_src2 := "^[\\p{Han}a-zA-Z\\s]{1,128}$"
-	if ok, _ := regexp.MatchString(_src2, p.Name); !ok {
+	_src1 := "^[\\p{Han}a-zA-Z\\s]{1,128}$"
+	if ok, _ := regexp.MatchString(_src1, p.Name); !ok {
 		return fmt.Errorf("field Name pattern rule failed, current value: %v", p.Name)
 	}
-	_src3 := []Gender{Gender_male, Gender_female, Gender_others}
+	_src2 := []Gender{Gender_male, Gender_female, Gender_others}
 	var _exist bool
-	for _, src := range _src3 {
+	for _, src := range _src2 {
 		if p.Gender == src {
 			_exist = true
 			break
@@ -246,12 +249,12 @@ func (p *UserCreateReq) IsValid() error {
 	if !_exist {
 		return fmt.Errorf("field Gender in rule failed, current value: %v", p.Gender)
 	}
-	_src4 := "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$"
-	if ok, _ := regexp.MatchString(_src4, p.Phone); !ok {
+	_src3 := "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$"
+	if ok, _ := regexp.MatchString(_src3, p.Phone); !ok {
 		return fmt.Errorf("field Phone pattern rule failed, current value: %v", p.Phone)
 	}
-	_src5 := "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
-	if ok, _ := regexp.MatchString(_src5, p.Email); !ok {
+	_src4 := "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
+	if ok, _ := regexp.MatchString(_src4, p.Email); !ok {
 		return fmt.Errorf("field Email pattern rule failed, current value: %v", p.Email)
 	}
 	if len(p.Description) > int(256) {

@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
+	"shield/account/internal/model/domain"
+	"shield/account/internal/model/po"
 	"shield/account/internal/repos"
 	"shield/account/internal/utils"
-	"shield/account/model/domain"
-	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
 	"time"
@@ -18,7 +18,7 @@ func Login(ctx context.Context, req *domain.LoginReq) (string, errs.Error) {
 		return "", err
 	}
 	if account == nil {
-		logs.CtxWarn(ctx, "account not exist")
+		logs.CtxWarnf(ctx, "account not exist")
 		return "", errs.AccountNotExistError
 	}
 

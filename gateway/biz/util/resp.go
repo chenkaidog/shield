@@ -3,7 +3,7 @@ package util
 import (
 	"net/http"
 	"shield/common/errs"
-	"shield/gateway/biz/model"
+	"shield/gateway/biz/model/resp"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -11,7 +11,7 @@ import (
 func BuildRespParamErr(c *app.RequestContext, err error) {
 	c.JSON(
 		http.StatusOK,
-		model.NewFailResp(
+		resp.NewFailResp(
 			errs.ParamError.Code(),
 			err.Error(),
 		),
@@ -21,7 +21,7 @@ func BuildRespParamErr(c *app.RequestContext, err error) {
 func BuildRespBizErr(c *app.RequestContext, err errs.Error) {
 	c.JSON(
 		http.StatusOK,
-		model.NewFailResp(
+		resp.NewFailResp(
 			err.Code(),
 			err.Msg(),
 		),
@@ -29,5 +29,5 @@ func BuildRespBizErr(c *app.RequestContext, err errs.Error) {
 }
 
 func BuildRespSuccess(c *app.RequestContext, body interface{}) {
-	c.JSON(http.StatusOK, model.NewSuccessResp(body))
+	c.JSON(http.StatusOK, resp.NewSuccessResp(body))
 }

@@ -1,4 +1,4 @@
-package model
+package resp
 
 import (
 	"shield/common/errs"
@@ -8,7 +8,7 @@ import (
 
 type Response struct {
 	gateway.BaseResp
-	Body interface{} `json:"body"`
+	Body interface{} `json:"body,omitempty"`
 }
 
 func NewSuccessResp(body interface{}) *Response {

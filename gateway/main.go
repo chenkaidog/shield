@@ -3,15 +3,22 @@
 package main
 
 import (
+	"shield/gateway/biz/config"
+	"shield/gateway/biz/middleware"
+	"shield/gateway/biz/repos"
 	"shield/gateway/biz/rpc"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 func main() {
+	config.Init()
 	rpc.Init()
+	repos.Init()
 
-	h := server.Default()
+	h := server.Default(server.WithHostPorts("0.0.0.0:8080"))
+
+	h.Use(middleware.Suite()...)
 
 	register(h)
 	h.Spin()

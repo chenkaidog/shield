@@ -2,8 +2,8 @@ package repos
 
 import (
 	"context"
+	"shield/account/internal/model/po"
 	"shield/account/internal/repos/mysql"
-	"shield/account/model/po"
 	"shield/common/errs"
 )
 

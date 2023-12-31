@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"context"
-	"shield/account/model/po"
+	"shield/account/internal/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
 	"shield/common/utils/gorm_utils"
@@ -28,7 +28,7 @@ func (dal *userDal) Insert(ctx context.Context, userPO ...*po.User) errs.Error {
 			return errs.DbDuplicateError.SetErr(err)
 		}
 
-		logs.CtxError(ctx, "insert user err: %v", err)
+		logs.CtxErrorf(ctx, "insert user err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
@@ -41,7 +41,7 @@ func (dal *userDal) Update(ctx context.Context, userPO *po.User) errs.Error {
 		Where("user_id", userPO.UserID).
 		Updates(userPO).Error
 	if err != nil {
-		logs.CtxError(ctx, "update user err: %v", err)
+		logs.CtxErrorf(ctx, "update user err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
@@ -56,7 +56,7 @@ func (dal *userDal) SelectByID(ctx context.Context, userID string) (*po.User, er
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select user by id err: %v", err)
+		logs.CtxErrorf(ctx, "select user by id err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 
@@ -71,7 +71,7 @@ func (dal *userDal) SelectByAccount(ctx context.Context, accountID string) (*po.
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select user by account err: %v", err)
+		logs.CtxErrorf(ctx, "select user by account err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 

@@ -35,5 +35,6 @@ type AccountStatusUpdateReq struct {
 }
 
 type AccountQueryReq struct {
-	AccountID string
+	Page int64
+	Size int64
 }

@@ -1,2 +1,5 @@
 gen_client:
 	kitex --thrift-plugin validator ../common/idl/account.thrift 
+
+gen_service:
+	hz update -idl ../common/idl/gateway.thrift

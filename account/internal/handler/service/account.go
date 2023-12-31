@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
+	"shield/account/internal/model/domain"
+	"shield/account/internal/model/po"
 	"shield/account/internal/repos"
 	"shield/account/internal/utils"
-	"shield/account/model/domain"
-	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
-	 "shield/common/utils/idgen"
+	"shield/common/utils/idgen"
 )
 
 func CreateAccount(ctx context.Context, req *domain.AccountCreateReq) (*domain.Account, errs.Error) {
@@ -18,7 +18,7 @@ func CreateAccount(ctx context.Context, req *domain.AccountCreateReq) (*domain.A
 		return nil, err
 	}
 	if account != nil {
-		logs.CtxWarn(ctx, "username already exists")
+		logs.CtxWarnf(ctx, "username already exists")
 		return nil, errs.UsernameDuplidateError
 	}
 
@@ -53,7 +53,7 @@ func UpdateAccountPassword(ctx context.Context, req *domain.AccountPswUpdateReq)
 		return err
 	}
 	if account == nil {
-		logs.CtxWarn(ctx, "account not exist")
+		logs.CtxWarnf(ctx, "account not exist")
 		return errs.AccountNotExistError
 	}
 
@@ -63,7 +63,7 @@ func UpdateAccountPassword(ctx context.Context, req *domain.AccountPswUpdateReq)
 	}
 
 	// 2、修改密码
-	salt, password := utils.EncodePassword(req.Password)
+	salt, password := utils.EncodePassword(req.NewPassword)
 	return repos.UpdateAccount(ctx, &po.Account{
 		AccountID: req.AccountID,
 		Salt:      salt,
@@ -87,18 +87,22 @@ func UpdateAccountStatus(ctx context.Context, req *domain.AccountStatusUpdateReq
 	})
 }
 
-func QueryAccount(ctx context.Context, req *domain.AccountQueryReq) (*domain.Account, errs.Error) {
-	account, err := repos.SelectAccountByID(ctx, req.AccountID)
+func QueryAccount(ctx context.Context, req *domain.AccountQueryReq) ([]*domain.Account, int64, errs.Error) {
+	limit, offset := req.Size, (req.Page-1)*req.Size
+	accountList, total, err := repos.SelectAccount(ctx, int(limit), int(offset))
 	if err != nil {
-		return nil, err
-	}
-	if account == nil {
-		return nil, nil
+		return nil, 0, err
 	}
 
-	return &domain.Account{
-		AccountID: account.AccountID,
-		Username:  account.Username,
-		Status:    domain.AccountStatus(account.Status),
-	}, nil
+	var result []*domain.Account
+	for _, account := range accountList {
+		result = append(result,
+			&domain.Account{
+				AccountID: account.AccountID,
+				Username:  account.Username,
+				Status:    domain.AccountStatus(account.Status),
+			})
+	}
+
+	return result, total, nil
 }

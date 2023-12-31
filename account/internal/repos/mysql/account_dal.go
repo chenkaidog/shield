@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"context"
-	"shield/account/model/po"
+	"shield/account/internal/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
 	"shield/common/utils/gorm_utils"
@@ -26,7 +26,7 @@ func (dal *accountDal) Insert(ctx context.Context, accountPO ...*po.Account) err
 			return errs.DbDuplicateError.SetErr(err)
 		}
 
-		logs.CtxError(ctx, "insert account err: %v", err)
+		logs.CtxErrorf(ctx, "insert account err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
@@ -39,22 +39,43 @@ func (dal *accountDal) Update(ctx context.Context, accountPO *po.Account) errs.E
 		Where("account_id", accountPO.AccountID).
 		Updates(accountPO).Error
 	if err != nil {
-		logs.CtxError(ctx, "update account err: %v", err)
+		logs.CtxErrorf(ctx, "update account err: %v", err)
 		return errs.DbError.SetErr(err)
 	}
 
 	return nil
 }
 
-func (dal *accountDal) SelectByID(ctx context.Context, accountID string) (*po.Account, errs.Error) {
+func (dal *accountDal) Select(ctx context.Context, limit, offset int) ([]*po.Account, int64, errs.Error) {
+	var result []*po.Account
+	if err := dal.GetGormDB().WithContext(ctx).
+		Limit(limit).
+		Offset(offset).
+		Find(&result).Error; err != nil {
+		logs.CtxErrorf(ctx, "select account by id err: %v", err)
+		return nil, 0, errs.DbError.SetErr(err)
+	}
+
+	var total int64
+	if err := dal.GetGormDB().WithContext(ctx).
+		Model(po.NewAccount()).
+		Count(&total).Error; err != nil {
+		logs.CtxErrorf(ctx, "count account err: %v", err)
+		return nil, 0, errs.DbError.SetErr(err)
+	}
+
+	return result, total, nil
+}
+
+func (dal *accountDal) SelectByID(ctx context.Context, accontID string) (*po.Account, errs.Error) {
 	result := po.NewAccount()
 	if err := dal.GetGormDB().WithContext(ctx).
-		Where("account_id", accountID).
+		Where("account_id", accontID).
 		Take(result).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select account by id err: %v", err)
+		logs.CtxErrorf(ctx, "select account by username err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 
@@ -69,7 +90,7 @@ func (dal *accountDal) SelectByUsername(ctx context.Context, username string) (*
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		logs.CtxError(ctx, "select account by username err: %v", err)
+		logs.CtxErrorf(ctx, "select account by username err: %v", err)
 		return nil, errs.DbError.SetErr(err)
 	}
 

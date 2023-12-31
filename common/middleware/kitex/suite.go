@@ -2,6 +2,7 @@ package kitex
 
 import (
 	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/server"
 )
 
@@ -18,6 +19,7 @@ func (*ServerSuite) Options() []server.Option {
 }
 
 func NewServerSuite() *ServerSuite {
+	klog.SetLogger(NewKitexLogger())
 	return new(ServerSuite)
 }
 
@@ -34,5 +36,6 @@ func (*ClientSuite) Options() []client.Option {
 }
 
 func NewClientSuite() *ClientSuite {
+	klog.SetLogger(NewKitexLogger())
 	return new(ClientSuite)
 }

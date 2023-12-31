@@ -18,9 +18,9 @@ func PanicRecoverMW(next endpoint.Endpoint) endpoint.Endpoint {
 				if panicked, err := stats.Panicked(); panicked {
 					// `err` 就是框架调用 recover() 收到的对象
 					if detailErr, ok := err.(*kerrors.DetailedError); ok {
-						logs.CtxError(ctx, "panic occur: %s\n%s", detailErr.Error(), detailErr.Stack())
+						logs.CtxErrorf(ctx, "panic occur: %s\n%s", detailErr.Error(), detailErr.Stack())
 					} else {
-						logs.CtxError(ctx, "panic occur: %v", err)
+						logs.CtxErrorf(ctx, "panic occur: %v", err)
 					}
 
 					return errs.ServerError.SetMsg("internal server error")
