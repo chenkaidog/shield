@@ -74,16 +74,15 @@ struct LoginRecordQueryResp{
 }
 
 struct PasswordUpdateReq {
-     1: string accountID (api.body="account_id");
-     2: string oldPassword (api.body="old_password");
-     3: string newPassword (api.body="new_password");
+     1: string oldPassword (api.body="old_password");
+     2: string newPassword (api.body="new_password");
 }
 
 service UserService {
     BaseResp Login(1: LoginReq req) (api.post="/login");
     BaseResp Logout(1: LogoutReq req) (api.post="/logout");
-    BaseResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/operator/user/query_user_info");
-    BaseResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/operator/user/query_login_record");
+    BaseResp QuerySelfUserInfo(1: UserInfoQueryReq req) (api.get="/operator/user/query_user_info");
+    BaseResp QuerySelfLoginRecord(1: LoginRecordQueryReq req) (api.get="/operator/user/query_login_record");
     BaseResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/operator/user/update_password");
 }
 
@@ -149,6 +148,8 @@ struct AccountStatusSwitchReq {
 service AdminService {
     BaseResp CreateAccount(1: AccountCreateReq req) (api.post="/operator/admin/create_account");
     BaseResp QueryAccount(1: AccountQueryReq req) (api.get="/operator/admin/query_account");
+    BaseResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/operator/admin/query_user_info");
+    BaseResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/operator/admin/query_login_record");
     BaseResp CreateUser(1: UserCreateReq req) (api.post="/operator/admin/create_user");
     BaseResp UpdateUserInfo(1: UserInfoUpdateReq req) (api.post="/operator/admin/update_user");
     BaseResp ResetPassword(1: PasswordRestReq req) (api.post="/operator/admin/rest_password");

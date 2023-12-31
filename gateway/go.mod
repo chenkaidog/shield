@@ -11,13 +11,15 @@ require (
 	github.com/apache/thrift v0.19.0
 	github.com/cloudwego/hertz v0.7.3
 	github.com/cloudwego/kitex v0.8.0
-	github.com/gorilla/securecookie v1.1.2
-	github.com/hertz-contrib/csrf v0.1.1
+	github.com/hertz-contrib/logger/accesslog v0.0.0-20231211035138-acc7b4e2984b
 	github.com/mssola/user_agent v0.6.0
 	shield/common v0.0.0-00010101000000-000000000000
 )
 
-require gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
+require (
+	github.com/gorilla/securecookie v1.1.2 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
+)
 
 require (
 	github.com/andeya/ameda v1.5.3 // indirect

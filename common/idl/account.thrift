@@ -50,7 +50,7 @@ struct AccountPasswordUpdateReq {
 }
 
 struct AccountPasswordUpdateResp {
-    255: required base.BaseReq base
+    255: required base.BaseResp base
 }
 
 struct AccountPasswordResetReq {
@@ -158,7 +158,7 @@ struct UserQueryReq {
     1: optional string userID (vt.pattern="^\\w{8,128}$")
     2: optional string accountID (vt.pattern="^\\w{8,128}$")
 
-    255: required base.BaseResp base
+    255: required base.BaseReq base
 }
 
 struct UserQueryResp {
@@ -175,7 +175,7 @@ struct UserUpdateReq {
     5: optional string email (vt.pattern="^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")
     6: optional string description (vt.max_size="256")
 
-    255: required base.BaseResp base
+    255: required base.BaseReq base
 }
 
 struct UserUpdateResp {

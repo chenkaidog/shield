@@ -59,8 +59,7 @@ func ServerTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 
 func ClientTraceMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, args, result interface{}) (err error) {
-		tr, ok := trace.TraceFromContext(ctx)
-		if ok {
+		if tr, ok := trace.TraceFromContext(ctx); ok {
 			if gfa, ok := args.(interface{ GetFirstArgument() interface{} }); ok {
 				if baseReq := getClientBaseReq(gfa.GetFirstArgument()); baseReq != nil {
 					baseReq.SetLogID(tr.LogID)
@@ -87,7 +86,12 @@ func getServerBaseReq(firstArg interface{}) serverBaseReq {
 	}
 
 	if _, ok := req.Type().FieldByName(baseFieldName); ok {
-		if result, ok := req.FieldByName(baseFieldName).Interface().(serverBaseReq); ok {
+		baseReqField := req.FieldByName(baseFieldName)
+		if baseReqField.Kind() == reflect.Ptr && baseReqField.IsNil() {
+			baseReqField.Set(reflect.New(baseReqField.Type().Elem()))
+		}
+
+		if result, ok := baseReqField.Interface().(serverBaseReq); ok {
 			return result
 		}
 		return nil
@@ -109,7 +113,12 @@ func getClientBaseReq(firstArg interface{}) clientBaseReq {
 	}
 
 	if _, ok := req.Type().FieldByName(baseFieldName); ok {
-		if result, ok := req.FieldByName(baseFieldName).Interface().(clientBaseReq); ok {
+		baseReqField := req.FieldByName(baseFieldName)
+		if baseReqField.Kind() == reflect.Ptr && baseReqField.IsNil() {
+			baseReqField.Set(reflect.New(baseReqField.Type().Elem()))
+		}
+
+		if result, ok := baseReqField.Interface().(clientBaseReq); ok {
 			return result
 		}
 		return nil

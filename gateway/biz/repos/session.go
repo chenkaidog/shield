@@ -8,7 +8,7 @@ import (
 )
 
 func genAccountSessionIDKey(accountId string) string {
-	return fmt.Sprintf("session_id_%s", accountId)
+	return fmt.Sprintf("shield_session_id_%s", accountId)
 }
 
 func SetAccountSessionID(ctx context.Context, accountId, token string) errs.Error {

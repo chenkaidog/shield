@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"shield/common/utils/random"
 	"shield/gateway/biz/config"
 	"shield/gateway/biz/repos"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/gorilla/securecookie"
 	"github.com/hertz-contrib/sessions"
 	"github.com/hertz-contrib/sessions/redis"
 )
@@ -20,7 +20,7 @@ func SessionMiddleware() app.HandlerFunc {
 	secret, bizErr := repos.GetRandomSecret(
 		context.Background(),
 		"kaidog_shield_gateway_session_secret",
-		string(securecookie.GenerateRandomKey(1024)),
+		random.RandStr(1024),
 	)
 	if bizErr != nil {
 		panic(bizErr)

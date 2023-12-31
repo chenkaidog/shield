@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 	"shield/account/internal/handler/service"
+	"shield/account/internal/model/domain"
 	"shield/account/kitex_gen/kaidog/shield/account"
-	"shield/account/model/domain"
 	"shield/common/errs"
 
 	"github.com/apache/thrift/lib/go/thrift"

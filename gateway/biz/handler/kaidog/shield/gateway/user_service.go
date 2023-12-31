@@ -7,6 +7,7 @@ import (
 
 	"shield/common/errs"
 	"shield/common/logs"
+	"shield/common/middleware/hertz/csrf"
 	"shield/gateway/biz/model/consts"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
 	"shield/gateway/biz/repos"
@@ -14,7 +15,6 @@ import (
 	"shield/gateway/biz/util"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/hertz-contrib/csrf"
 	"github.com/hertz-contrib/sessions"
 )
 
@@ -53,7 +53,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	c.Header(consts.CsrfHeaderName, csrf.GetToken(c))
+	c.Header(csrf.CsrfHeaderName, csrf.GetToken(c))
 
 	if bizErr = repos.SetAccountSessionID(ctx, rpcResp.AccountId, sess.ID()); bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
@@ -72,15 +72,6 @@ func Login(ctx context.Context, c *app.RequestContext) {
 // @router /logout [POST]
 // 删除会话信息
 func Logout(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req gateway.LogoutReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
-		util.BuildRespParamErr(c, err)
-		return
-	}
-
 	sess := sessions.Default(c)
 	accountId, ok := sess.Get(consts.SessionAccountId).(string)
 	if ok {
@@ -103,19 +94,10 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 	util.BuildRespSuccess(c, nil)
 }
 
-// QueryUserInfo .
+// QuerySelfUserInfo .
 // @router /user_info [GET]
-func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req gateway.UserInfoQueryReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
-		util.BuildRespParamErr(c, err)
-		return
-	}
-
-	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, req.GetAccountID())
+func QuerySelfUserInfo(ctx context.Context, c *app.RequestContext) {
+	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, util.GetAccountId(c))
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
@@ -137,19 +119,10 @@ func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
 	)
 }
 
-// QueryLoginRecord .
+// QuerySelfLoginRecord .
 // @router /login_record [GET]
-func QueryLoginRecord(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req gateway.LoginRecordQueryReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
-		util.BuildRespParamErr(c, err)
-		return
-	}
-
-	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, req.GetAccountID())
+func QuerySelfLoginRecord(ctx context.Context, c *app.RequestContext) {
+	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, util.GetAccountId(c))
 	if bizErr != nil {
 		util.BuildRespBizErr(c, bizErr)
 		return
@@ -196,7 +169,7 @@ func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 	bizErr := rpc.UpdatePassword(
 		ctx,
 		&rpc.UpdatePasswordReq{
-			AccountId:   req.GetAccountID(),
+			AccountId:   util.GetAccountId(c),
 			OldPassword: req.GetOldPassword(),
 			NewPassword: req.GetNewPassword(),
 		},

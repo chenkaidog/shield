@@ -19,6 +19,9 @@ require (
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/gorilla/context v1.1.2 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/gorilla/sessions v1.2.2 // indirect
 )
 
 require (
@@ -42,6 +45,7 @@ require (
 	github.com/google/pprof v0.0.0-20220608213341-c488b8fa1db3 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect
+	github.com/hertz-contrib/sessions v1.0.3
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

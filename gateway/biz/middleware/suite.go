@@ -4,6 +4,7 @@ import (
 	"shield/common/middleware/hertz"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/logger/accesslog"
 )
 
 func Suite() []app.HandlerFunc {
@@ -12,6 +13,7 @@ func Suite() []app.HandlerFunc {
 	var funcList []app.HandlerFunc
 	return append(
 		funcList,
+		accesslog.New(),
 		hertz.ServerTraceMW(),
 		SessionMiddleware(),
 		CsrfMiddleware(),

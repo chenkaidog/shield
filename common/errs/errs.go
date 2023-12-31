@@ -3,7 +3,7 @@ package errs
 import "fmt"
 
 type Error interface {
-	error
+	Error() string
 	Code() int32
 	Msg() string
 	SetErr(err error) Error

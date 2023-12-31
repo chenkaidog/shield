@@ -106,3 +106,23 @@ func _operatorMw() []app.HandlerFunc {
 		},
 	}
 }
+
+func _queryloginrecord0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _queryuserinfo0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _queryselfloginrecordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _queryselfuserinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

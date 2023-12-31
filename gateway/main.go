@@ -16,7 +16,7 @@ func main() {
 	rpc.Init()
 	repos.Init()
 
-	h := server.Default()
+	h := server.Default(server.WithHostPorts("0.0.0.0:8080"))
 
 	h.Use(middleware.Suite()...)
 

@@ -26,14 +26,16 @@ func Register(r *server.Hertz) {
 			_admin.POST("/create_account", append(_createaccountMw(), gateway.CreateAccount)...)
 			_admin.POST("/create_user", append(_createuserMw(), gateway.CreateUser)...)
 			_admin.GET("/query_account", append(_queryaccountMw(), gateway.QueryAccount)...)
+			_admin.GET("/query_login_record", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
+			_admin.GET("/query_user_info", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
 			_admin.POST("/rest_password", append(_resetpasswordMw(), gateway.ResetPassword)...)
 			_admin.POST("/switch_account_status", append(_switchaccountstatusMw(), gateway.SwitchAccountStatus)...)
 			_admin.POST("/update_user", append(_updateuserinfoMw(), gateway.UpdateUserInfo)...)
 		}
 		{
 			_user := _operator.Group("/user", _userMw()...)
-			_user.GET("/query_login_record", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
-			_user.GET("/query_user_info", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
+			_user.GET("/query_login_record", append(_queryselfloginrecordMw(), gateway.QuerySelfLoginRecord)...)
+			_user.GET("/query_user_info", append(_queryselfuserinfoMw(), gateway.QuerySelfUserInfo)...)
 			_user.POST("/update_password", append(_updatepasswordMw(), gateway.UpdatePassword)...)
 		}
 	}

@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"context"
-	"shield/account/model/po"
+	"shield/account/internal/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
 	"shield/common/utils/gorm_utils"

@@ -206,3 +206,81 @@ func QueryAccount(ctx context.Context, c *app.RequestContext) {
 		AccountList: accountList,
 	})
 }
+
+// QueryUserInfo .
+// @router /operator/admin/query_user_info [GET]
+func QueryUserInfo(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req gateway.UserInfoQueryReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
+		return
+	}
+
+	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, req.GetAccountID())
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
+
+	util.BuildRespSuccess(
+		c,
+		&gateway.UserInfoQueryResp{
+			AccountID:   rpcResp.AccountId,
+			UserID:      rpcResp.UserId,
+			Name:        rpcResp.Name,
+			Gender:      rpcResp.Gender,
+			Phone:       rpcResp.Phone,
+			Email:       rpcResp.Email,
+			Description: rpcResp.Description,
+			CreatedAt:   rpcResp.CreatedAt.Unix(),
+			UpdatedAt:   rpcResp.CreatedAt.Unix(),
+		},
+	)
+}
+
+// QueryLoginRecord .
+// @router /operator/admin/query_login_record [GET]
+func QueryLoginRecord(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req gateway.LoginRecordQueryReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
+		util.BuildRespParamErr(c, err)
+		return
+	}
+
+	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, req.GetAccountID())
+	if bizErr != nil {
+		util.BuildRespBizErr(c, bizErr)
+		return
+	}
+
+	var recordList []*gateway.LoginRecord
+	for _, record := range rpcResp.RecordList {
+		recordList = append(
+			recordList,
+			&gateway.LoginRecord{
+				AccountID: record.AccountId,
+				Ipv4:      record.Ipv4,
+				Device:    record.Device,
+				Status:    record.Status,
+				Reason:    record.Reason,
+				LoginAt:   record.LoginAt.Unix(),
+			},
+		)
+	}
+
+	util.BuildRespSuccess(
+		c,
+		&gateway.LoginRecordQueryResp{
+			Page:        rpcResp.Page,
+			Size:        rpcResp.Size,
+			Total:       rpcResp.Total,
+			LoginRecord: recordList,
+		},
+	)
+}

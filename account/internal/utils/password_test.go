@@ -7,7 +7,7 @@ import (
 )
 
 func TestEncodePassword(t *testing.T) {
-	salt1, pwd1 := EncodePassword("123")
+	salt1, pwd1 := EncodePassword("123456abc")
 	salt2, pwd2 := EncodePassword("123")
 
 	t.Log(salt1, salt2)
@@ -18,7 +18,7 @@ func TestEncodePassword(t *testing.T) {
 		assert.NotEqual(t, pwd1, pwd2)
 	}
 
-	assert.True(t, PasswordVerify(salt1, pwd1, "123"))
+	assert.True(t, PasswordVerify(salt1, pwd1, "123456abc"))
 	assert.True(t, PasswordVerify(salt2, pwd2, "123"))
 
 	assert.False(t, PasswordVerify(salt1, pwd2, "123"))

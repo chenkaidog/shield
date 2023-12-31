@@ -179,8 +179,8 @@ github.com/gorilla/sessions v1.2.2/go.mod h1:ePLdVu+jbEgHH+KWw8I1z2wqd0BAdAQh/8L
 github.com/henrylee2cn/ameda v1.4.8/go.mod h1:liZulR8DgHxdK+MEwvZIylGnmcjzQ6N6f2PlWe7nEO4=
 github.com/henrylee2cn/ameda v1.4.10/go.mod h1:liZulR8DgHxdK+MEwvZIylGnmcjzQ6N6f2PlWe7nEO4=
 github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8/go.mod h1:Nhe/DM3671a5udlv2AdV2ni/MZzgfv2qrPL5nIi3EGQ=
-github.com/hertz-contrib/csrf v0.1.1 h1:53HxseVzpW4JEUJ7ONAaQCyNBWXl+rn42LVqgwEQzRg=
-github.com/hertz-contrib/csrf v0.1.1/go.mod h1:z6CW935kPp1qy1XHXL7memdWInXXTc3OiMLp/cEmZQY=
+github.com/hertz-contrib/logger/accesslog v0.0.0-20231211035138-acc7b4e2984b h1:RoBp+TurP+46VZl31VMV+6wO2SlNlXwyVwjc93s5/tI=
+github.com/hertz-contrib/logger/accesslog v0.0.0-20231211035138-acc7b4e2984b/go.mod h1:vB3TNAD0IvvDhfY1SWSeCaAVbWleDKEuQ4zOK70hb64=
 github.com/hertz-contrib/sessions v1.0.3 h1:lXBcmpPlMUhVSua54lxrIzJwhKXaI6zZcc+RgQx8xrE=
 github.com/hertz-contrib/sessions v1.0.3/go.mod h1:46/DHSScV2EcK08er3IFvGHbh6a7VLMMiMlI+30QXoA=
 github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=

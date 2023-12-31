@@ -1,7 +1,7 @@
 package sensitive
 
 import (
-	"reflect"
+	"encoding/json"
 )
 
 type SensitiveMarshal struct {
@@ -30,52 +30,29 @@ func (sm *SensitiveMarshal) SafeMarshal(obj interface{}) string {
 }
 
 func (sm *SensitiveMarshal) sensitiveMarshal(obj interface{}) interface{} {
-	if obj == nil {
-		return obj
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return nil
 	}
 
-	objValue := reflect.ValueOf(obj)
-	if objValue.Kind() == reflect.Ptr {
-		if objValue.IsNil() {
-			return obj
+	sensitiveMapper := make(map[string]interface{})
+
+	if err = json.Unmarshal(data, &sensitiveMapper); err != nil {
+		return nil
+	}
+
+	return sm.maskData(sensitiveMapper)
+}
+
+func (sm *SensitiveMarshal) maskData(rawMapper map[string]interface{}) map[string]interface{} {
+	for k, v := range rawMapper {
+		if sm.sensitiveSet[k] {
+			rawMapper[k] = "******"
 		}
-		// 如果是指针，需要获取指针指向的结构体值
-		objValue = objValue.Elem()
-	}
-	objType := objValue.Type()
-
-	// 如果是结构体，遍历每个字段
-	if objValue.Kind() == reflect.Struct {
-		mapper := make(map[string]interface{})
-
-		for i := 0; i < objValue.NumField(); i++ {
-			field := objValue.Field(i)                  // 获取字段
-			fieldName := objType.Field(i).Name          // 获取字段名称
-			jsonTag := objType.Field(i).Tag.Get("json") // 获取字段tag中的json属性
-			if jsonTag != "" {
-				if jsonTag == "-" {
-					continue
-				}
-				fieldName = jsonTag // 用json名称覆盖字段名称
-			}
-
-			if sm.sensitiveSet[fieldName] {
-				mapper[fieldName] = "******"
-			} else {
-				if field.Kind() == reflect.Struct ||
-					field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct {
-					// 如果字段类型是结构体或者结构体指针，递归序列化
-					mapper[fieldName] = sm.sensitiveMarshal(field.Interface())
-				} else {
-					// 其他类型直接添加
-					mapper[fieldName] = field.Interface()
-				}
-			}
+		if m, ok := v.(map[string]interface{}); ok {
+			rawMapper[k] = sm.maskData(m)
 		}
-
-		return mapper
 	}
 
-	// 否则直接返回
-	return objValue.Interface()
+	return rawMapper
 }

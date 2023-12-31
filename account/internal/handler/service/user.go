@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
+	"shield/account/internal/model/domain"
+	"shield/account/internal/model/po"
 	"shield/account/internal/repos"
-	"shield/account/model/domain"
-	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/utils/idgen"
 )

@@ -6,8 +6,8 @@ import (
 	"shield/common/utils/sensitive"
 	"time"
 
-	"github.com/cloudwego/kitex/pkg/consts"
 	"github.com/cloudwego/kitex/pkg/endpoint"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
 )
 
 func init() {
@@ -24,26 +24,22 @@ func KitexLogMW(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request, response interface{}) error {
 		startTime := time.Now()
 
-		methodName, ok := ctx.Value(consts.CtxKeyMethod).(string)
-		if !ok {
-			methodName = ""
+		methodName := rpcinfo.GetRPCInfo(ctx).Invocation().MethodName()
+
+		if reqArg, ok := request.(interface{ GetFirstArgument() interface{} }); ok {
+			reqBody := reqArg.GetFirstArgument()
+			logs.CtxInfof(ctx, "[%s] request body: %v", methodName, sensitiveMarshal.SafeMarshal(reqBody))
 		}
 
-		var reqBody, respBody interface{} = request, response
-		if reqArg, ok := request.(interface{ GetFirstArgument() interface{} }); ok {
-			reqBody = reqArg.GetFirstArgument()
+		err := next(ctx, request, response)
+		if err != nil {
+			logs.CtxErrorf(ctx, "[%s] request fails: %s", methodName, err.Error())
+			return err
 		}
 		if respArg, ok := response.(interface{ GetResult() interface{} }); ok {
-			respBody = respArg.GetResult()
-		}
-
-		logs.CtxInfof(ctx, "[%s] request body: %v", methodName, sensitiveMarshal.SafeMarshal(reqBody))
-		defer func() {
+			respBody := respArg.GetResult()
 			logs.CtxInfof(ctx, "[%s] resp body: %v, cost: %dms",
 				methodName, sensitiveMarshal.SafeMarshal(respBody), time.Since(startTime)/time.Millisecond)
-		}()
-		if err := next(ctx, request, response); err != nil {
-			return err
 		}
 
 		return nil

@@ -16,7 +16,7 @@ const (
 	logFileMaxBackups = 10
 	// LogFileMaxAge 保留日志最大天数
 	logFileMaxAge   = 14
-	defaultLogLevel = LevelInfo
+	defaultLogLevel = LevelDebug
 
 	envLogOutputFileName      = "logs_output_file_name"
 	envLogsSetOutputLocalFile = "logs_set_local_file"

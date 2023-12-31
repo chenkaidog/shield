@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
+	"shield/account/internal/model/domain"
+	"shield/account/internal/model/po"
 	"shield/account/internal/repos"
 	"shield/account/internal/utils"
-	"shield/account/model/domain"
-	"shield/account/model/po"
 	"shield/common/errs"
 	"shield/common/logs"
 	"shield/common/utils/idgen"
@@ -63,7 +63,7 @@ func UpdateAccountPassword(ctx context.Context, req *domain.AccountPswUpdateReq)
 	}
 
 	// 2、修改密码
-	salt, password := utils.EncodePassword(req.Password)
+	salt, password := utils.EncodePassword(req.NewPassword)
 	return repos.UpdateAccount(ctx, &po.Account{
 		AccountID: req.AccountID,
 		Salt:      salt,

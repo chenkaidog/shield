@@ -2,18 +2,20 @@ package middleware
 
 import (
 	"context"
+	"net/http"
+	"shield/common/logs"
+	"shield/common/middleware/hertz/csrf"
+	"shield/common/utils/random"
 	"shield/gateway/biz/repos"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/gorilla/securecookie"
-	"github.com/hertz-contrib/csrf"
 )
 
 func CsrfMiddleware() app.HandlerFunc {
 	secret, err := repos.GetRandomSecret(
 		context.Background(),
 		"kaidog_shield_gateway_csrf_secret",
-		string(securecookie.GenerateRandomKey(1024)),
+		random.RandStr(1024),
 	)
 	if err != nil {
 		panic(err)
@@ -27,6 +29,11 @@ func CsrfMiddleware() app.HandlerFunc {
 			default:
 				return false
 			}
+		}),
+		csrf.WithErrorFunc(func(ctx context.Context, c *app.RequestContext) {
+			csrfErr := c.Errors.Last()
+			logs.CtxErrorf(ctx, "scrf recover err: %s", csrfErr.Error())
+			c.AbortWithMsg(csrfErr.Error(), http.StatusUnauthorized)
 		}),
 	)
 }

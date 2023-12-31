@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"shield/common/logs"
 	"strings"
@@ -31,10 +32,16 @@ func (*loggerHook) ProcessHook(next redis.ProcessHook) redis.ProcessHook {
 
 		costTime := float64(time.Since(startTime).Microseconds()) / 1000
 
+		var args []string
+		for _, arg := range cmd.Args() {
+			args = append(args, fmt.Sprintf("%v", arg))
+		}
+		commands := strings.Join(args, " ")
+
 		if err != nil && err != redis.Nil {
-			logs.CtxErrorf(ctx, "go-redis command fail: %s, err: %s, cost: %.3f", cmd.String(), err.Error(), costTime)
+			logs.CtxErrorf(ctx, "go-redis command fail: %s, err: %s, cost: %.3f", commands, err.Error(), costTime)
 		} else {
-			logs.CtxInfof(ctx, "redis command: %s, cost: %.3f", cmd.String(), costTime)
+			logs.CtxInfof(ctx, "redis command: %s, cost: %.3f", commands, costTime)
 		}
 
 		return err

@@ -9,7 +9,7 @@ replace (
 
 require (
 	github.com/apache/thrift v0.19.0
-	github.com/cloudwego/kitex v0.7.3
+	github.com/cloudwego/kitex v0.8.0
 	github.com/stretchr/testify v1.8.4
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.2
@@ -19,17 +19,17 @@ require (
 
 require (
 	github.com/bytedance/gopkg v0.0.0-20230728082804-614d0af6619b // indirect
-	github.com/bytedance/sonic v1.9.1 // indirect
-	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
-	github.com/chenzhuoyu/iasm v0.9.0 // indirect
+	github.com/bytedance/sonic v1.10.2 // indirect
+	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
+	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/choleraehyq/pid v0.0.17 // indirect
 	github.com/cloudwego/configmanager v0.2.0 // indirect
-	github.com/cloudwego/dynamicgo v0.1.3 // indirect
+	github.com/cloudwego/dynamicgo v0.1.6 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
-	github.com/cloudwego/frugal v0.1.8 // indirect
+	github.com/cloudwego/frugal v0.1.12 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
 	github.com/cloudwego/netpoll v0.5.1 // indirect
-	github.com/cloudwego/thriftgo v0.3.2-0.20230828085742-edaddf2c17af // indirect
+	github.com/cloudwego/thriftgo v0.3.3 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
