@@ -4,7 +4,6 @@ import (
 	"context"
 	"reflect"
 	"shield/common/errs"
-	"shield/common/logs"
 
 	"github.com/cloudwego/kitex/pkg/endpoint"
 	"github.com/cloudwego/kitex/pkg/kerrors"
@@ -25,7 +24,6 @@ func ServerErrorHandlerMW(next endpoint.Endpoint) endpoint.Endpoint {
 			}
 
 			if err != nil {
-				logs.CtxDebugf(ctx, "err type: %T", err)
 				return handleServerFailedResp(resp, err)
 			}
 
@@ -40,7 +38,6 @@ func ServerErrorHandlerMW(next endpoint.Endpoint) endpoint.Endpoint {
 func handleServerFailedResp(resp interface{}, err error) error {
 	baseRespField := reflect.ValueOf(resp).Elem().FieldByName(baseFieldName)
 	if baseRespField.Kind() == reflect.Ptr && baseRespField.IsNil() {
-		logs.Debug("base is nil")
 		baseRespField.Set(reflect.New(baseRespField.Type().Elem()))
 	}
 
@@ -49,10 +46,8 @@ func handleServerFailedResp(resp interface{}, err error) error {
 		SetMsg(val string)
 		SetSuccess(val bool)
 	}); ok {
-		logs.Debugf("interface assert true")
 		baseInf.SetSuccess(false)
 		if bizErr, ok := convert2BizErr(err); ok {
-			logs.Debugf("is biz err")
 			baseInf.SetCode(bizErr.Code())
 			baseInf.SetMsg(bizErr.Msg())
 			return nil

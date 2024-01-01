@@ -23,20 +23,44 @@ func Register(r *server.Hertz) {
 		_operator := root.Group("/operator", _operatorMw()...)
 		{
 			_admin := _operator.Group("/admin", _adminMw()...)
-			_admin.POST("/create_account", append(_createaccountMw(), gateway.CreateAccount)...)
-			_admin.POST("/create_user", append(_createuserMw(), gateway.CreateUser)...)
-			_admin.GET("/query_account", append(_queryaccountMw(), gateway.QueryAccount)...)
-			_admin.GET("/query_login_record", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
-			_admin.GET("/query_user_info", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
-			_admin.POST("/rest_password", append(_resetpasswordMw(), gateway.ResetPassword)...)
-			_admin.POST("/switch_account_status", append(_switchaccountstatusMw(), gateway.SwitchAccountStatus)...)
-			_admin.POST("/update_user", append(_updateuserinfoMw(), gateway.UpdateUserInfo)...)
+			{
+				_account := _admin.Group("/account", _accountMw()...)
+				_account.POST("/create", append(_createaccountMw(), gateway.CreateAccount)...)
+				_account.GET("/query", append(_queryaccountMw(), gateway.QueryAccount)...)
+			}
+			{
+				_account_status := _admin.Group("/account_status", _account_statusMw()...)
+				_account_status.POST("/change", append(_switchaccountstatusMw(), gateway.SwitchAccountStatus)...)
+			}
+			{
+				_login_record := _admin.Group("/login_record", _login_recordMw()...)
+				_login_record.GET("/query", append(_queryloginrecordMw(), gateway.QueryLoginRecord)...)
+			}
+			{
+				_password := _admin.Group("/password", _passwordMw()...)
+				_password.POST("/reset", append(_resetpasswordMw(), gateway.ResetPassword)...)
+			}
+			{
+				_user_info := _admin.Group("/user_info", _user_infoMw()...)
+				_user_info.POST("/create", append(_createuserMw(), gateway.CreateUser)...)
+				_user_info.GET("/query", append(_queryuserinfoMw(), gateway.QueryUserInfo)...)
+				_user_info.POST("/update", append(_updateuserinfoMw(), gateway.UpdateUserInfo)...)
+			}
 		}
 		{
 			_user := _operator.Group("/user", _userMw()...)
-			_user.GET("/query_login_record", append(_queryselfloginrecordMw(), gateway.QuerySelfLoginRecord)...)
-			_user.GET("/query_user_info", append(_queryselfuserinfoMw(), gateway.QuerySelfUserInfo)...)
-			_user.POST("/update_password", append(_updatepasswordMw(), gateway.UpdatePassword)...)
+			{
+				_login_record0 := _user.Group("/login_record", _login_record0Mw()...)
+				_login_record0.GET("/query", append(_queryselfloginrecordMw(), gateway.QuerySelfLoginRecord)...)
+			}
+			{
+				_password0 := _user.Group("/password", _password0Mw()...)
+				_password0.POST("/update", append(_updatepasswordMw(), gateway.UpdatePassword)...)
+			}
+			{
+				_user_info0 := _user.Group("/user_info", _user_info0Mw()...)
+				_user_info0.GET("/query", append(_queryselfuserinfoMw(), gateway.QuerySelfUserInfo)...)
+			}
 		}
 	}
 }

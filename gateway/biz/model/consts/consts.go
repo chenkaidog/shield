@@ -5,3 +5,5 @@ const (
 )
 
 const SessionAccountId = "account_id"
+
+const ContextAccountId = "ctx_account_id"

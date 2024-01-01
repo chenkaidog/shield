@@ -1,11 +1,5 @@
 namespace go kaidog.shield.gateway
 
-struct BaseResp {
-    1: i32 code (api.body="code");
-    2: bool success (api.body="success");
-    3: string msg (api.body="msg");
-}
-
 enum AccountStatus {
     valid = 1
     invalid = 2 
@@ -28,18 +22,28 @@ struct LoginReq {
 }
 
 struct LoginResp {
-    1: string accountID (api.body="account_id");
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: string accountID (api.body="account_id");
 }
 
 struct LogoutReq {
-    1: required string accountID (api.body="account_id");
+    
 }
 
-struct UserInfoQueryReq {
-    1: required string accountID (api.query="account_id");
+struct LogoutResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
 }
 
-struct UserInfoQueryResp {
+struct SelfUserInfoQueryReq {
+    
+}
+
+struct UserInfo {
     1: string accountID (api.body="account_id");
     2: string username (api.body="username");
     3: AccountStatus status (api.body="status");
@@ -53,6 +57,14 @@ struct UserInfoQueryResp {
     11: i64 updatedAt (api.body="updated_at");
 }
 
+struct SelfUserInfoQueryResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: UserInfo info (api.body="info");
+}
+
 struct LoginRecord {
     1: string accountID (api.body="account_id");
     2: string ipv4 (api.body="ipv4");
@@ -62,15 +74,19 @@ struct LoginRecord {
     6: i64 loginAt (api.body="login_at");
 }
 
-struct LoginRecordQueryReq {
-     1: required string accountID (api.query="account_id");
+struct SelfLoginRecordQueryReq {
+     
 }
 
-struct LoginRecordQueryResp{
-    1: list<LoginRecord> LoginRecord (api.body="login_record");
-    2: i64 total (api.body="total");
-    3: i64 page (api.body="page");
-    4: i64 size  (api.body="size");
+struct SelfLoginRecordQueryResp{
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: list<LoginRecord> LoginRecord (api.body="login_record");
+    5: i64 total (api.body="total");
+    6: i64 page (api.body="page");
+    7: i64 size  (api.body="size");
 }
 
 struct PasswordUpdateReq {
@@ -78,27 +94,37 @@ struct PasswordUpdateReq {
      2: string newPassword (api.body="new_password");
 }
 
+struct PasswordUpdateResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+}
+
 service UserService {
-    BaseResp Login(1: LoginReq req) (api.post="/login");
-    BaseResp Logout(1: LogoutReq req) (api.post="/logout");
-    BaseResp QuerySelfUserInfo(1: UserInfoQueryReq req) (api.get="/operator/user/query_user_info");
-    BaseResp QuerySelfLoginRecord(1: LoginRecordQueryReq req) (api.get="/operator/user/query_login_record");
-    BaseResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/operator/user/update_password");
+    LoginResp Login(1: LoginReq req) (api.post="/login");
+    LogoutResp Logout(1: LogoutReq req) (api.post="/logout");
+    SelfUserInfoQueryResp QuerySelfUserInfo(1: SelfUserInfoQueryReq req) (api.get="/operator/user/user_info/query");
+    SelfLoginRecordQueryResp QuerySelfLoginRecord(1: SelfLoginRecordQueryReq req) (api.get="/operator/user/login_record/query");
+    PasswordUpdateResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/operator/user/password/update");
 }
 
 struct Account { 
-    1: required string accountID (api.body="account_id");
-    2: required string username (api.body="username");
-    3: required AccountStatus status (api.body="status");
+    1: required string AccountID (api.body="account_id");
+    2: required string Username (api.body="username");
+    3: required AccountStatus Status (api.body="status");
 }
 
 struct AccountCreateReq {
-    1: required string username (api.body="username");
-    2: required string password (api.body="password");
+    1: required string Username (api.body="username");
+    2: required string Password (api.body="password");
 }
 
 struct AccountCreateResp {
-    1: string accountID (api.body="account_id");
+    1: i32 Code (api.body="code");
+    2: bool Success (api.body="success");
+    3: string Msg (api.body="msg");
+
+    4: string AccountID (api.body="account_id");
 }
 
 struct AccountQueryReq {
@@ -107,10 +133,41 @@ struct AccountQueryReq {
 }
 
 struct AccountQueryResp {
-    1: list<Account> accountList (api.body="account_list");
-    2: i64 total (api.body="total");
-    3: i64 page (api.body="page");
-    4: i64 size  (api.body="size");
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: list<Account> accountList (api.body="account_list");
+    5: i64 total (api.body="total");
+    6: i64 page (api.body="page");
+    7: i64 size  (api.body="size");
+}
+
+struct UserInfoQueryReq {
+    1: list<string> AccountIdList (api.body="account_id_list");
+}
+
+struct UserInfoQueryResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: list<UserInfo> userList (api.body="user_list");
+}
+
+struct LoginRecordQueryReq {
+    1: required string accountID (api.body="account_id");
+}
+
+struct LoginRecordQueryResp{
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: list<LoginRecord> LoginRecord (api.body="login_record");
+    5: i64 total (api.body="total");
+    6: i64 page (api.body="page");
+    7: i64 size  (api.body="size");
 }
 
 struct UserCreateReq {
@@ -123,7 +180,11 @@ struct UserCreateReq {
 }
 
 struct UserCreateResp {
-    1: string userID (api.body="user_id");
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+
+    4: string userID (api.body="user_id");
 }
 
 struct UserInfoUpdateReq {
@@ -135,9 +196,21 @@ struct UserInfoUpdateReq {
     6: optional string description (api.body="description"); 
 }
 
+struct UserInfoUpdateResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+}
+
 struct PasswordRestReq {
     1: required string accountID (api.body="account_id");
     2: required string newPassword (api.body="new_password"); 
+}
+
+struct PasswordRestResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
 }
 
 struct AccountStatusSwitchReq {
@@ -145,13 +218,19 @@ struct AccountStatusSwitchReq {
     2: required AccountStatus status (api.body="status");
 }
 
+struct AccountStatusSwitchResp {
+    1: i32 code (api.body="code");
+    2: bool success (api.body="success");
+    3: string msg (api.body="msg");
+}
+
 service AdminService {
-    BaseResp CreateAccount(1: AccountCreateReq req) (api.post="/operator/admin/create_account");
-    BaseResp QueryAccount(1: AccountQueryReq req) (api.get="/operator/admin/query_account");
-    BaseResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/operator/admin/query_user_info");
-    BaseResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/operator/admin/query_login_record");
-    BaseResp CreateUser(1: UserCreateReq req) (api.post="/operator/admin/create_user");
-    BaseResp UpdateUserInfo(1: UserInfoUpdateReq req) (api.post="/operator/admin/update_user");
-    BaseResp ResetPassword(1: PasswordRestReq req) (api.post="/operator/admin/rest_password");
-    BaseResp SwitchAccountStatus(1: AccountStatusSwitchReq req) (api.post="/operator/admin/switch_account_status");
+    AccountCreateResp CreateAccount(1: AccountCreateReq req) (api.post="/operator/admin/account/create");
+    AccountQueryResp QueryAccount(1: AccountQueryReq req) (api.get="/operator/admin/account/query");
+    UserInfoQueryResp QueryUserInfo(1: UserInfoQueryReq req) (api.get="/operator/admin/user_info/query");
+    LoginRecordQueryResp QueryLoginRecord(1: LoginRecordQueryReq req) (api.get="/operator/admin/login_record/query");
+    UserCreateResp CreateUser(1: UserCreateReq req) (api.post="/operator/admin/user_info/create");
+    UserInfoUpdateResp UpdateUserInfo(1: UserInfoUpdateReq req) (api.post="/operator/admin/user_info/update");
+    PasswordRestResp ResetPassword(1: PasswordRestReq req) (api.post="/operator/admin/password/reset");
+    AccountStatusSwitchResp SwitchAccountStatus(1: AccountStatusSwitchReq req) (api.post="/operator/admin/account_status/change");
 }

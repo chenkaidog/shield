@@ -7,14 +7,24 @@ import (
 	"net/http"
 	"shield/gateway/biz/model/consts"
 	"shield/gateway/biz/repos"
+	"shield/gateway/biz/util"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/sessions"
 )
 
 func rootMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		func(ctx context.Context, c *app.RequestContext) {
+			sess := sessions.Default(c)
+			accountId, ok := sess.Get(consts.SessionAccountId).(string)
+			if ok {
+				c.Set(consts.ContextAccountId, accountId)
+			}
+
+			c.Next(ctx)
+		},
+	}
 }
 
 func _createaccountMw() []app.HandlerFunc {
@@ -37,8 +47,17 @@ func _queryloginrecordMw() []app.HandlerFunc {
 }
 
 func _logoutMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		func(ctx context.Context, c *app.RequestContext) {
+			_, ok := util.GetAccountId(c)
+			if !ok {
+				c.AbortWithMsg("user not login", http.StatusUnauthorized)
+				return
+			}
+
+			c.Next(ctx)
+		},
+	}
 }
 
 func _resetpasswordMw() []app.HandlerFunc {
@@ -84,8 +103,7 @@ func _queryaccountMw() []app.HandlerFunc {
 func _operatorMw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		func(ctx context.Context, c *app.RequestContext) {
-			sess := sessions.Default(c)
-			accountId, ok := sess.Get(consts.SessionAccountId).(string)
+			accountId, ok := util.GetAccountId(c)
 			if !ok {
 				c.AbortWithMsg("user not login", http.StatusUnauthorized)
 				// todo: redirect
@@ -96,7 +114,8 @@ func _operatorMw() []app.HandlerFunc {
 				c.AbortWithMsg("server error", http.StatusInternalServerError)
 				return
 			}
-			if sessID != sess.ID() {
+
+			if sessID != sessions.Default(c).ID() {
 				c.AbortWithMsg("login timeout", http.StatusUnauthorized)
 				// todo: redirect
 				return
@@ -123,6 +142,46 @@ func _queryselfloginrecordMw() []app.HandlerFunc {
 }
 
 func _queryselfuserinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _accountMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _account_statusMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _login_recordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _passwordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _user_infoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _login_record0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _password0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _user_info0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
