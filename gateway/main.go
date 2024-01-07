@@ -18,6 +18,9 @@ func main() {
 
 	h := server.Default(server.WithHostPorts("0.0.0.0:8080"))
 
+	h.Static("/", "render/")
+	h.LoadHTMLGlob("render/html/*")
+
 	h.Use(middleware.Suite()...)
 
 	register(h)

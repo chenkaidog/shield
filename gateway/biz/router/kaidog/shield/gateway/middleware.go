@@ -106,7 +106,7 @@ func _operatorMw() []app.HandlerFunc {
 			accountId, ok := util.GetAccountId(c)
 			if !ok {
 				c.AbortWithMsg("user not login", http.StatusUnauthorized)
-				// todo: redirect
+				c.Redirect(http.StatusUnauthorized, []byte("/index/login"))
 				return
 			}
 			sessID, bizErr := repos.GetAccountSessionID(ctx, accountId)
@@ -116,8 +116,8 @@ func _operatorMw() []app.HandlerFunc {
 			}
 
 			if sessID != sessions.Default(c).ID() {
-				c.AbortWithMsg("login timeout", http.StatusUnauthorized)
-				// todo: redirect
+				c.AbortWithMsg("user not login", http.StatusUnauthorized)
+				c.Redirect(http.StatusUnauthorized, []byte("/index/login"))
 				return
 			}
 

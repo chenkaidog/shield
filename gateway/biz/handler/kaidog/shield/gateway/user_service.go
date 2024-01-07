@@ -11,7 +11,7 @@ import (
 	"shield/gateway/biz/model/consts"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
 	"shield/gateway/biz/util"
-	"shield/gateway/service"
+	"shield/gateway/biz/service"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/sessions"
