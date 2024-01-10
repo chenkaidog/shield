@@ -27,6 +27,30 @@ func rootMw() []app.HandlerFunc {
 	}
 }
 
+func _operatorMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		func(ctx context.Context, c *app.RequestContext) {
+			accountId, ok := util.GetAccountId(c)
+			if !ok {
+				c.AbortWithMsg("user not login", http.StatusUnauthorized)
+				return
+			}
+			sessID, bizErr := repos.GetAccountSessionID(ctx, accountId)
+			if bizErr != nil {
+				c.AbortWithMsg("server error", http.StatusInternalServerError)
+				return
+			}
+
+			if sessID != sessions.Default(c).ID() {
+				c.AbortWithMsg("user not login", http.StatusUnauthorized)
+				return
+			}
+
+			c.Next(ctx)
+		},
+	}
+}
+
 func _createaccountMw() []app.HandlerFunc {
 	// your code...
 	return nil
@@ -38,6 +62,7 @@ func _createuserMw() []app.HandlerFunc {
 }
 
 func _loginMw() []app.HandlerFunc {
+	// your code...
 	return nil
 }
 
@@ -47,17 +72,8 @@ func _queryloginrecordMw() []app.HandlerFunc {
 }
 
 func _logoutMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		func(ctx context.Context, c *app.RequestContext) {
-			_, ok := util.GetAccountId(c)
-			if !ok {
-				c.AbortWithMsg("user not login", http.StatusUnauthorized)
-				return
-			}
-
-			c.Next(ctx)
-		},
-	}
+	// your code...
+	return nil
 }
 
 func _resetpasswordMw() []app.HandlerFunc {
@@ -98,32 +114,6 @@ func _userMw() []app.HandlerFunc {
 func _queryaccountMw() []app.HandlerFunc {
 	// your code...
 	return nil
-}
-
-func _operatorMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		func(ctx context.Context, c *app.RequestContext) {
-			accountId, ok := util.GetAccountId(c)
-			if !ok {
-				c.AbortWithMsg("user not login", http.StatusUnauthorized)
-				c.Redirect(http.StatusUnauthorized, []byte("/index/login"))
-				return
-			}
-			sessID, bizErr := repos.GetAccountSessionID(ctx, accountId)
-			if bizErr != nil {
-				c.AbortWithMsg("server error", http.StatusInternalServerError)
-				return
-			}
-
-			if sessID != sessions.Default(c).ID() {
-				c.AbortWithMsg("user not login", http.StatusUnauthorized)
-				c.Redirect(http.StatusUnauthorized, []byte("/index/login"))
-				return
-			}
-
-			c.Next(ctx)
-		},
-	}
 }
 
 func _queryloginrecord0Mw() []app.HandlerFunc {

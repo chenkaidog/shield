@@ -3,24 +3,21 @@
 package main
 
 import (
-	"context"
-	"net/http"
 	handler "shield/gateway/biz/handler"
-	"shield/gateway/biz/handler/index"
+	"shield/gateway/biz/router/index"
 
-	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
+	
+	r.GET("/login", index.Login)
+	r.GET("/error/:error_code", index.Error)
 
-	idx := r.Group("/index")
+	idx := r.Group("/index", index.IndexMw()...)
 	{
-		idx.GET("/login", index.Login)
-		idx.GET("/redirect", func(c context.Context, ctx *app.RequestContext) {
-			ctx.Redirect(http.StatusOK, []byte("/index/login"))
-		})
+		idx.GET("/home", index.Home)
 	}
 }

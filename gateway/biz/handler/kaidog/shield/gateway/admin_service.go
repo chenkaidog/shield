@@ -8,8 +8,8 @@ import (
 	"shield/common/errs"
 	"shield/common/logs"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
-	"shield/gateway/biz/util"
 	"shield/gateway/biz/service"
+	"shield/gateway/biz/util"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )

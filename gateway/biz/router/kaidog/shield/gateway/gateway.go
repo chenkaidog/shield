@@ -18,9 +18,9 @@ func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
 	root.POST("/login", append(_loginMw(), gateway.Login)...)
-	root.POST("/logout", append(_logoutMw(), gateway.Logout)...)
 	{
 		_operator := root.Group("/operator", _operatorMw()...)
+		_operator.POST("/logout", append(_logoutMw(), gateway.Logout)...)
 		{
 			_admin := _operator.Group("/admin", _adminMw()...)
 			{

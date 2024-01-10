@@ -1,14 +1,10 @@
-document.getElementById("loginForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent default form submission
-  
-    // Gather form data
-    var formData = new FormData(this);
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("loginBut").addEventListener("click",  function() {
     var loginData = {
-      username: formData.get("username"),
-      password: formData.get("password")
+      username: document.getElementById("username").value,
+      password: document.getElementById("password").value
     };
   
-    // Send login data as JSON to the server
     fetch("/login", {
       method: "POST",
       headers: {
@@ -17,9 +13,12 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
       body: JSON.stringify(loginData)
     })
     .then(function(response) {
-     
+      if (response.ok) {
+        
+      }
     })
     .catch(function(error) {
       alert(error)
     });
   });
+})

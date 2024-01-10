@@ -1,12 +1,12 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #bfd6df;
-    margin: 0;
-    padding: 20;
-  }
-  
-  #loginForm {
-    background-color: #93c8e0fa;
+  font-family: Arial, sans-serif;
+  background-color: #bfd6df;
+  margin: 0;
+  padding: 20;
+}
+
+#loginForm {
+  background-color: #93c8e0fa;
   border: 1px solid #888;
   width: 300px; /* Adjust width as needed */
   height: 300px; /* Adjust height as needed */
@@ -22,42 +22,42 @@ a:link {color:#000000;}
 a:visited {color:#ff0000;}
 a:hover {color:#003cff;}
 #loginForgetPassword{
-float: right;
+  float: right;
 }
 
 h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  label {
-    margin-bottom: 20px;
-  }
-  
-  input[type="text"],
-  input[type="password"] {
-    margin-bottom: 15px;
-    border-radius: 5px;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-    width: 100%;
+label {
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="password"] {
+  margin-bottom: 15px;
+  border-radius: 5px;
+
+  width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
   display: inline-block;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  }
-  
-  input[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    margin-top: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    width: 100%;
-  }
-  
-  input[type="submit"]:hover {
-    background-color: #45a049;
-  }
+}
+
+#loginBut {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+}
+
+#loginBut:hover {
+  background-color: #45a000;
+}

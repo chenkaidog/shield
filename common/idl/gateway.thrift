@@ -102,7 +102,7 @@ struct PasswordUpdateResp {
 
 service UserService {
     LoginResp Login(1: LoginReq req) (api.post="/login");
-    LogoutResp Logout(1: LogoutReq req) (api.post="/logout");
+    LogoutResp Logout(1: LogoutReq req) (api.post="/operator/logout");
     SelfUserInfoQueryResp QuerySelfUserInfo(1: SelfUserInfoQueryReq req) (api.get="/operator/user/user_info/query");
     SelfLoginRecordQueryResp QuerySelfLoginRecord(1: SelfLoginRecordQueryReq req) (api.get="/operator/user/login_record/query");
     PasswordUpdateResp UpdatePassword(1: PasswordUpdateReq req) (api.post="/operator/user/password/update");

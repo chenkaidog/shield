@@ -17,7 +17,8 @@ func main() {
 	repos.Init()
 
 	h := server.Default(server.WithHostPorts("0.0.0.0:8080"))
-
+	
+	h.Delims("{[{", "}]}")
 	h.Static("/", "render/")
 	h.LoadHTMLGlob("render/html/*")
 
