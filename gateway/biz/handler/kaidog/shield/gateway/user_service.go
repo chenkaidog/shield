@@ -44,7 +44,6 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		util.BuildBizResp(c, &resp, bizErr)
 		return
 	}
-	resp.AccountID = loginResp.AccountID
 
 	sess := sessions.Default(c)
 	sess.Set(consts.SessionAccountId, loginResp.AccountID)

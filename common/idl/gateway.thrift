@@ -25,8 +25,6 @@ struct LoginResp {
     1: i32 code (api.body="code");
     2: bool success (api.body="success");
     3: string msg (api.body="msg");
-
-    4: string accountID (api.body="account_id");
 }
 
 struct LogoutReq {
