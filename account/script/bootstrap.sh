@@ -18,4 +18,5 @@ if [ ! -d "$KITEX_LOG_DIR/rpc" ]; then
     mkdir -p "$KITEX_LOG_DIR/rpc"
 fi
 
+echo "$CURDIR/bin/kaidog.shield.account"
 exec "$CURDIR/bin/kaidog.shield.account"

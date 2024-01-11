@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/hertz-contrib/sessions"
 	"github.com/mssola/user_agent"
 )
 
@@ -28,12 +27,16 @@ func GetDevice(c *app.RequestContext) string {
 	return "UNKNOWN"
 }
 
-func GetAccountId(c *app.RequestContext) string {
-	sess := sessions.Default(c)
-	accountId, ok := sess.Get(consts.SessionAccountId).(string)
-	if ok {
-		return accountId
+func GetAccountId(c *app.RequestContext) (string, bool) {
+	val, ok := c.Get(consts.ContextAccountId)
+	if !ok {
+		return "", false
 	}
 
-	return ""
+	accId, ok := val.(string)
+	if !ok {
+		return "", false
+	}
+
+	return accId, true
 }

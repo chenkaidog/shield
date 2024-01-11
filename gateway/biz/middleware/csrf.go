@@ -33,7 +33,7 @@ func CsrfMiddleware() app.HandlerFunc {
 		csrf.WithErrorFunc(func(ctx context.Context, c *app.RequestContext) {
 			csrfErr := c.Errors.Last()
 			logs.CtxErrorf(ctx, "scrf recover err: %s", csrfErr.Error())
-			c.AbortWithMsg(csrfErr.Error(), http.StatusUnauthorized)
+			c.AbortWithMsg(csrfErr.Error(), http.StatusForbidden)
 		}),
 	)
 }

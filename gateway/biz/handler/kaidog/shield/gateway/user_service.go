@@ -10,8 +10,7 @@ import (
 	"shield/common/middleware/hertz/csrf"
 	"shield/gateway/biz/model/consts"
 	gateway "shield/gateway/biz/model/kaidog/shield/gateway"
-	"shield/gateway/biz/repos"
-	"shield/gateway/biz/rpc"
+	"shield/gateway/biz/service"
 	"shield/gateway/biz/util"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,134 +23,135 @@ import (
 func Login(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req gateway.LoginReq
+	var resp gateway.LoginResp
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
-		util.BuildRespParamErr(c, err)
+		util.BuildBizResp(c, &resp, errs.ParamError.SetErr(err))
 		return
 	}
 
-	rpcResp, bizErr := rpc.Login(
+	loginResp, bizErr := service.Login(
 		ctx,
-		&rpc.LoginReq{
+		&service.LoginReq{
 			Username: req.GetUsername(),
 			Password: req.GetPassword(),
-			Ipv4:     util.GetIp(c),
+			Ip:       util.GetIp(c),
 			Device:   util.GetDevice(c),
 		},
 	)
 	if bizErr != nil {
-		util.BuildRespBizErr(c, bizErr)
+		util.BuildBizResp(c, &resp, bizErr)
 		return
 	}
 
 	sess := sessions.Default(c)
-	sess.Set(consts.SessionAccountId, rpcResp.AccountId)
+	sess.Set(consts.SessionAccountId, loginResp.AccountID)
 	if err = sess.Save(); err != nil {
 		logs.CtxErrorf(ctx, "save session err: %v", err)
-		util.BuildRespBizErr(c, errs.ServerError)
+		util.BuildBizResp(c, &resp, errs.ServerError.SetErr(err))
 		return
 	}
 
 	c.Header(csrf.CsrfHeaderName, csrf.GetToken(c))
 
-	if bizErr = repos.SetAccountSessionID(ctx, rpcResp.AccountId, sess.ID()); bizErr != nil {
-		util.BuildRespBizErr(c, bizErr)
+	if bizErr = service.StoreSessionId(ctx, loginResp.AccountID, sess.ID()); bizErr != nil {
+		util.BuildBizResp(c, &resp, bizErr)
 		return
 	}
 
-	util.BuildRespSuccess(
-		c,
-		&gateway.LoginResp{
-			AccountID: rpcResp.AccountId,
-		},
-	)
+	util.BuildBizResp(c, &resp, nil)
 }
 
 // Logout .
 // @router /logout [POST]
 // 删除会话信息
 func Logout(ctx context.Context, c *app.RequestContext) {
-	sess := sessions.Default(c)
-	accountId, ok := sess.Get(consts.SessionAccountId).(string)
-	if ok {
-		sessID, bizErr := repos.GetAccountSessionID(ctx, accountId)
-		if bizErr != nil {
-			util.BuildRespBizErr(c, bizErr)
-			return
-		}
-		if sess.ID() == sessID {
-			if bizErr = repos.RemoveAccountSessionID(ctx, accountId); bizErr != nil {
-				util.BuildRespBizErr(c, bizErr)
-				return
-			}
-		}
-
-		sess.Clear()
-		_ = sess.Save()
+	var err error
+	var req gateway.LogoutReq
+	var resp gateway.LogoutResp
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
+		util.BuildBizResp(c, &resp, errs.ParamError.SetErr(err))
+		return
 	}
 
-	util.BuildRespSuccess(c, nil)
+	accountId := c.MustGet(consts.ContextAccountId).(string)
+
+	sessID, bizErr := service.GetSessionId(ctx, accountId)
+	if bizErr != nil {
+		util.BuildBizResp(c, &resp, bizErr)
+		return
+	}
+
+	sess := sessions.Default(c)
+	if sess.ID() == sessID {
+		if bizErr = service.RemoveSessionId(ctx, accountId); bizErr != nil {
+			util.BuildBizResp(c, &resp, bizErr)
+			return
+		}
+	}
+
+	sess.Clear()
+	_ = sess.Save()
+
+	util.BuildBizResp(c, &resp, nil)
 }
 
 // QuerySelfUserInfo .
 // @router /user_info [GET]
 func QuerySelfUserInfo(ctx context.Context, c *app.RequestContext) {
-	rpcResp, bizErr := rpc.QueryUserInfoByAccountId(ctx, util.GetAccountId(c))
-	if bizErr != nil {
-		util.BuildRespBizErr(c, bizErr)
+	var err error
+	var req gateway.SelfUserInfoQueryReq
+	var resp gateway.SelfUserInfoQueryResp
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
+		util.BuildBizResp(c, &resp, errs.ParamError.SetErr(err))
 		return
 	}
 
-	util.BuildRespSuccess(
-		c,
-		&gateway.UserInfoQueryResp{
-			AccountID:   rpcResp.AccountId,
-			UserID:      rpcResp.UserId,
-			Name:        rpcResp.Name,
-			Gender:      rpcResp.Gender,
-			Phone:       rpcResp.Phone,
-			Email:       rpcResp.Email,
-			Description: rpcResp.Description,
-			CreatedAt:   rpcResp.CreatedAt.Unix(),
-			UpdatedAt:   rpcResp.CreatedAt.Unix(),
+	queryResp, bizErr := service.QuerySelfUserInfo(
+		ctx,
+		&service.SelfUserInfoQueryReq{
+			AccountID: c.MustGet(consts.ContextAccountId).(string),
 		},
 	)
+	if queryResp != nil {
+		resp.Info = queryResp.Info
+	}
+
+	util.BuildBizResp(c, &resp, bizErr)
 }
 
 // QuerySelfLoginRecord .
 // @router /login_record [GET]
 func QuerySelfLoginRecord(ctx context.Context, c *app.RequestContext) {
-	rpcResp, bizErr := rpc.QueryLoginRecordByAccountId(ctx, util.GetAccountId(c))
-	if bizErr != nil {
-		util.BuildRespBizErr(c, bizErr)
+	var err error
+	var req gateway.SelfLoginRecordQueryReq
+	var resp gateway.SelfLoginRecordQueryResp
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
+		util.BuildBizResp(c, &resp, errs.ParamError.SetErr(err))
 		return
 	}
 
-	var recordList []*gateway.LoginRecord
-	for _, record := range rpcResp.RecordList {
-		recordList = append(
-			recordList,
-			&gateway.LoginRecord{
-				AccountID: record.AccountId,
-				Ipv4:      record.Ipv4,
-				Device:    record.Device,
-				Status:    record.Status,
-				Reason:    record.Reason,
-				LoginAt:   record.LoginAt.Unix(),
-			},
-		)
-	}
-
-	util.BuildRespSuccess(
-		c,
-		&gateway.LoginRecordQueryResp{
-			Page:        rpcResp.Page,
-			Size:        rpcResp.Size,
-			Total:       rpcResp.Total,
-			LoginRecord: recordList,
+	queryResp, bizErr := service.QuerySelfLoginRecord(
+		ctx,
+		&service.SelfLoginRecordQueryReq{
+			AccountID: c.MustGet(consts.ContextAccountId).(string),
 		},
 	)
+	if queryResp != nil {
+		resp.LoginRecord = queryResp.LoginRecord
+		resp.Total = queryResp.Total
+		resp.Page = queryResp.Page
+		resp.Size = queryResp.Size
+	}
+
+	util.BuildBizResp(c, &resp, bizErr)
 }
 
 // UpdatePassword .
@@ -159,25 +159,22 @@ func QuerySelfLoginRecord(ctx context.Context, c *app.RequestContext) {
 func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req gateway.PasswordUpdateReq
+	var resp gateway.PasswordUpdateResp
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		logs.CtxErrorf(ctx, "BindAndValidate fail, %v", err)
-		util.BuildRespParamErr(c, err)
+		util.BuildBizResp(c, &resp, errs.ParamError.SetErr(err))
 		return
 	}
 
-	bizErr := rpc.UpdatePassword(
+	bizErr := service.UpdatePassword(
 		ctx,
-		&rpc.UpdatePasswordReq{
-			AccountId:   util.GetAccountId(c),
+		&service.PasswordUpdateReq{
+			AccountID:   c.MustGet(consts.ContextAccountId).(string),
 			OldPassword: req.GetOldPassword(),
 			NewPassword: req.GetNewPassword(),
 		},
 	)
-	if bizErr != nil {
-		util.BuildRespBizErr(c, bizErr)
-		return
-	}
 
-	util.BuildRespSuccess(c, nil)
+	util.BuildBizResp(c, &resp, bizErr)
 }
